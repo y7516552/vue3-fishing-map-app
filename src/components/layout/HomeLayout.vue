@@ -65,3 +65,9 @@ getBreadcrumbList()
   </SidebarProvider>
   </main>
 </template>
+
+<style>
+SidebarProvider{
+  z-index: 1000;
+}
+</style>

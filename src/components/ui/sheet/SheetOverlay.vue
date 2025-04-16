@@ -27,6 +27,7 @@ const delegatedProps = computed(() => {
       )
     "
     v-bind="delegatedProps"
+    class="z-1000"
   >
     <slot />
   </DialogOverlay>

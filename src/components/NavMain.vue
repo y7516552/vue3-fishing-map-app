@@ -24,7 +24,7 @@ defineProps({
 
 <template>
   <SidebarGroup>
-    <SidebarGroupLabel>Platform</SidebarGroupLabel>
+    <SidebarGroupLabel>選單</SidebarGroupLabel>
     <SidebarMenu>
       <Collapsible
         v-for="item in items"
@@ -35,7 +35,14 @@ defineProps({
       >
         <SidebarMenuItem>
           <CollapsibleTrigger as-child>
-            <SidebarMenuButton :tooltip="item.title">
+            <SidebarMenuButton v-if="!item.items" :tooltip="item.title" :href="item.url">
+              <component :is="item.icon" v-if="item.icon" />
+              <a :href="item.url">
+                <span>{{ item.title }}</span>
+              </a>
+            </SidebarMenuButton>
+            
+            <SidebarMenuButton v-else :tooltip="item.title" >
               <component :is="item.icon" v-if="item.icon" />
               <span>{{ item.title }}</span>
               <ChevronRight
@@ -44,7 +51,7 @@ defineProps({
             </SidebarMenuButton>
           </CollapsibleTrigger>
           <CollapsibleContent>
-            <SidebarMenuSub>
+            <SidebarMenuSub v-if="item.items">
               <SidebarMenuSubItem
                 v-for="subItem in item.items"
                 :key="subItem.title"
@@ -62,3 +69,4 @@ defineProps({
     </SidebarMenu>
   </SidebarGroup>
 </template>
+

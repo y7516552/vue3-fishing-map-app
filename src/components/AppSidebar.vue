@@ -1,6 +1,6 @@
 <script setup>
 import NavMain from '@/components/NavMain.vue';
-import NavProjects from '@/components/NavProjects.vue';
+// import NavProjects from '@/components/NavProjects.vue';
 import NavUser from '@/components/NavUser.vue';
 import TeamSwitcher from '@/components/TeamSwitcher.vue';
 import {
@@ -12,13 +12,9 @@ import {
 } from '@/components/ui/sidebar';
 
 import {
-  AudioWaveform,
   BookOpen,
-  Command,
-  Frame,
   GalleryVerticalEnd,
   Map,
-  PieChart,
   Settings2,
   SquareTerminal,
 } from 'lucide-vue-next';
@@ -39,20 +35,11 @@ const data = {
   },
   teams: [
     {
-      name: 'Acme Inc',
+      name: '台灣釣魚地圖',
       logo: GalleryVerticalEnd,
-      plan: 'Enterprise',
+      plan: 'Taiwan fishing map',
     },
-    {
-      name: 'Acme Corp.',
-      logo: AudioWaveform,
-      plan: 'Startup',
-    },
-    {
-      name: 'Evil Corp.',
-      logo: Command,
-      plan: 'Free',
-    },
+    
   ],
   navMain: [
     {
@@ -77,25 +64,11 @@ const data = {
     },
     {
       title: '地圖',
-      url: '#',
+      url: '/map',
       icon: Map,
-      items: [
-        {
-          title: 'Genesis',
-          url: '#',
-        },
-        {
-          title: 'Explorer',
-          url: '#',
-        },
-        {
-          title: 'Quantum',
-          url: '#',
-        },
-      ],
     },
     {
-      title: 'Documentation',
+      title: '收費',
       url: '#',
       icon: BookOpen,
       items: [
@@ -141,34 +114,17 @@ const data = {
       ],
     },
   ],
-  projects: [
-    {
-      name: 'Design Engineering',
-      url: '#',
-      icon: Frame,
-    },
-    {
-      name: 'Sales & Marketing',
-      url: '#',
-      icon: PieChart,
-    },
-    {
-      name: 'Travel',
-      url: '#',
-      icon: Map,
-    },
-  ],
 };
 </script>
 
 <template>
-  <Sidebar v-bind="props">
+  <Sidebar class="z-1000"  v-bind="props">
     <SidebarHeader>
       <TeamSwitcher :teams="data.teams" />
     </SidebarHeader>
     <SidebarContent>
       <NavMain :items="data.navMain" />
-      <NavProjects :projects="data.projects" />
+      <!-- <NavProjects :projects="data.projects" /> -->
     </SidebarContent>
     <SidebarFooter>
       <NavUser :user="data.user" />
@@ -176,3 +132,4 @@ const data = {
     <SidebarRail />
   </Sidebar>
 </template>
+
