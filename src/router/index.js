@@ -1,13 +1,31 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-
+import HomeLayout from '@/components/layout/HomeLayout.vue'
+import MapView from '@/views/MapView.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: HomeView,
+      component: HomeLayout,
+      meta:{
+        title:"首頁",
+      },
+      children:[
+        {
+          path: '/',
+          name: 'home',
+          component: HomeView,
+        },
+        {
+          path: '/map',
+          name: 'map',
+          component: MapView,
+          meta:{
+            title:"地圖",
+          },
+        }
+      ]
     },
     {
       path: '/about',
