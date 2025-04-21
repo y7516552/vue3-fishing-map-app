@@ -2,6 +2,10 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import HomeLayout from '@/components/layout/HomeLayout.vue'
 import MapView from '@/views/MapView.vue'
+import CommunityView from '@/views/CommunityView.vue'
+import InfoView from '@/views/InfoView.vue'
+import InfoPage from '@/pages/info/InfoPage.vue'
+import FishingSpots from '@/pages/info/FishingSpotsPage.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -24,16 +28,50 @@ const router = createRouter({
           meta:{
             title:"地圖",
           },
-        }
+        },
+        {
+          path: '/community',
+          name: 'community',
+          component: CommunityView,
+          meta:{
+            title:"社群",
+          },
+        },
+        {
+          path: '/about',
+          name: 'about',
+          meta:{
+            title:"關於網站",
+          },
+          component: () => import('../views/AboutView.vue'),
+        },
+        {
+          path: '/info',
+          name: 'info',
+          meta:{
+            title:"相關資訊",
+          },
+          component: InfoView,
+          children:[
+            {
+              path: '/info',
+              name: 'info-page',
+              meta:{
+                title:"資訊一覽",
+              },
+              component: InfoPage,
+            },
+            {
+              path: '/info/fishingSpot',
+              name: 'fishingSpot',
+              meta:{
+                title:"釣點資訊",
+              },
+              component: FishingSpots,
+            }
+          ]
+        },
       ]
-    },
-    {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AboutView.vue'),
     },
   ],
 })

@@ -42,7 +42,7 @@ defineProps({
               </a>
             </SidebarMenuButton>
             
-            <SidebarMenuButton v-else :tooltip="item.title" >
+            <SidebarMenuButton v-else :tooltip="item.title" :href="item.url">
               <component :is="item.icon" v-if="item.icon" />
               <span>{{ item.title }}</span>
               <ChevronRight

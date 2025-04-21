@@ -13,7 +13,7 @@ import {
 
 import {
   BookOpen,
-  GalleryVerticalEnd,
+  FishSymbol,
   Map,
   Settings2,
   SquareTerminal,
@@ -36,82 +36,72 @@ const data = {
   teams: [
     {
       name: '台灣釣魚地圖',
-      logo: GalleryVerticalEnd,
+      logo: FishSymbol,
       plan: 'Taiwan fishing map',
     },
     
   ],
   navMain: [
     {
-      title: '社群',
-      url: '#',
-      icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: 'History',
-          url: '#',
-        },
-        {
-          title: 'Starred',
-          url: '#',
-        },
-        {
-          title: 'Settings',
-          url: '#',
-        },
-      ],
-    },
-    {
       title: '地圖',
       url: '/map',
       icon: Map,
     },
     {
-      title: '收費',
-      url: '#',
+      title: '相關資訊',
+      url: '/info',
       icon: BookOpen,
       items: [
         {
-          title: 'Introduction',
+          title: '資訊一覽',
+          url: '/info',
+        },
+        {
+          title: '釣點',
+          url: '/info/fishingSpot',
+        },
+        {
+          title: '釣具店',
           url: '#',
         },
         {
-          title: 'Get Started',
-          url: '#',
-        },
-        {
-          title: 'Tutorials',
-          url: '#',
-        },
-        {
-          title: 'Changelog',
+          title: '魚種',
           url: '#',
         },
       ],
     },
     {
+      title: '關於網站',
+      url: '/about',
+      icon: BookOpen,
+    },
+    {
+      title: '社群',
+      url: '/community',
+      icon: SquareTerminal,
+    },
+    {
       title: '設定',
       url: '#',
       icon: Settings2,
-      items: [
-        {
-          title: 'General',
-          url: '#',
-        },
-        {
-          title: 'Team',
-          url: '#',
-        },
-        {
-          title: 'Billing',
-          url: '#',
-        },
-        {
-          title: 'Limits',
-          url: '#',
-        },
-      ],
+      // items: [
+      //   {
+      //     title: 'General',
+      //     url: '#',
+      //   },
+      //   {
+      //     title: 'Team',
+      //     url: '#',
+      //   },
+      //   {
+      //     title: 'Billing',
+      //     url: '#',
+      //   },
+      //   {
+      //     title: 'Limits',
+      //     url: '#',
+      //   },
+      // ],
     },
   ],
 };
