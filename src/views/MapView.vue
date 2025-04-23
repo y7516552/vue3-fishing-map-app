@@ -1,27 +1,35 @@
 <script setup>
+import axios from 'axios';
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { onMounted, ref } from "vue";
 
+
 const mapContainer = ref(null);
 
 const fishingSpotList = ref([]);
+
+const getfishSpot = async() => {
+  try{
+    let apiUrl = 'http://localhost:3000/api/v1/fishingSpot'
+    const { data } = await axios.get(apiUrl)
+    
+    fishingSpotList.value = data.result
+  
+    console.log('getfishSpot',fishingSpotList.value)
+  }catch(err) {
+    console.log( err)
+  }
+    
+  
+}
 // const shrimpingSpotList = ref([]);
 // const fishingTackleShopList =ref([])
+// getfishSpot()
 
 
-fishingSpotList.value=[
-  {
-    title:"這是釣點1",
-    latlng:[24.17859, 120.629218]
-  },
-  {
-    title:"這是釣點2",
-    latlng:[24.175598, 120.626729]
-  }
-]
-onMounted(() => {
-  
+onMounted( async() => {
+  await getfishSpot()
   const Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
 	  attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
   });
@@ -59,12 +67,24 @@ onMounted(() => {
   //   })
 
   // }
-  var crownHill = L.marker([24.17859, 120.629218]).bindPopup('這是釣點1'),
-    rubyHill = L.marker([24.175598, 120.626729]).bindPopup('這是釣點2');
+  // var crownHill = L.marker([24.17859, 120.629218]).bindPopup('這是釣點1'),
+  //   rubyHill = L.marker([24.175598, 120.626729]).bindPopup('這是釣點2');
+
+  let SpotList = []
+
+  console.log('fishingSpotList.value',fishingSpotList.value)
+
+  fishingSpotList.value.forEach(item => {
+      console.log('item',item)
+      let spotMarker = L.marker(item.locations.coordinates.reverse()).bindPopup(item.name)
+      SpotList.push(spotMarker)
+    });
     
-  var fishingSpot = L.layerGroup([crownHill, rubyHill]);
+  var fishingSpot = L.layerGroup(SpotList);
 
   console.log('fishingSpot',fishingSpot)
+
+
   var overlayMaps = {
     "釣點": fishingSpot,
     // "釣具店":[],
@@ -87,17 +107,21 @@ onMounted(() => {
   // 地圖監聽事件
   const popup = L.popup();
   map.on("click", (e) => {
-    console.log(e.latlng);
+    // console.log(e.latlng);
+
+    let lat = e.latlng.lat; // 緯度
+    let lng = e.latlng.lng; // 經度
+
     popup
       .setLatLng(e.latlng)
-      .setContent("You clicked the map at " + e.latlng.toString())
+      .setContent(`緯度：${lat}<br/>經度：${lng}<br/>[ ${lng},${lat} ]`)
       .openOn(map);
   });
 
   map.locate({setView: true, maxZoom: 16, enableHighAccuracy: true});
 
   function onLocationFound(e) {
-    console.log(e)
+    // console.log(e)
     var radius = e.accuracy;
 
     L.marker(e.latlng).addTo(map)
