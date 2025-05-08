@@ -1,4 +1,5 @@
 <script setup>
+import axios from 'axios';
 import {
   Dialog,
   DialogScrollContent,
@@ -15,17 +16,24 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel'
-import { CircleAlert,FishOff ,ThermometerSun,MapPinned} from 'lucide-vue-next'
+import { CircleAlert,FishOff ,ThermometerSun,MapPinned,ThumbsUp} from 'lucide-vue-next'
 import { AspectRatio } from '@/components/ui/aspect-ratio'
 import StarRating from 'vue-star-rating'
 import ReviewsAuthor from './reviews/ReviewsAuthor.vue'
 
 
-import { inject} from 'vue'
+import { inject ,ref, watch} from 'vue'
 
+const emit = defineEmits(['likeSpot','dislikeSpot','createReview','updateReview'])
+
+const loading = ref(false)
 
 const spotData = inject('spotData')
 const dailogOpen = inject('dailogOpen')
+
+watch(spotData,() => {
+  console.log('update')
+})
 
 const windyUrl = ([lat,lon]) => {
   return`https://www.windy.com/${lat}/${lon}?waves,${lat},${lon},16`
@@ -43,6 +51,37 @@ const spotRating = (rewiews) => {
     totalScore += e.rating
   });
   return (totalScore / rewiews.length)
+}
+
+const likeSpot = async (id) => {
+  try{
+    // loading.value = true
+    // let apiUrl = `http://localhost:3000/api/v1/fishingSpot/${id}/like`
+    // const { data } = await axios.get(apiUrl)
+    // console.log('data',data)
+
+    emit('likeSpot',id)
+    
+  }catch(err) {
+    console.log( err)
+    loading.value = false
+  }
+}
+
+
+const dislikeSpot = async (id) => {
+  try{
+    // loading.value = true
+    // let apiUrl = `http://localhost:3000/api/v1/fishingSpot/${id}/dislike`
+    // const { data } = await axios.get(apiUrl)
+    // console.log('data',data)
+
+    emit('dislikeSpot',id)
+    
+  }catch(err) {
+    console.log( err)
+    loading.value = false
+  }
 }
 
 
@@ -100,6 +139,8 @@ const spotRating = (rewiews) => {
                 >
                   <MapPinned size="32"/>
                 </a>
+                <ThumbsUp @click="likeSpot(spotData._id)" size="32" class="mr-4"/>
+                <ThumbsUp @click="dislikeSpot(spotData._id)" fill="" size="32" class="mr-4"/>
               </div>
             </div>
           </DialogHeader>

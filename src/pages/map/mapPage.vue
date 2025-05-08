@@ -2,17 +2,21 @@
 import axios from 'axios';
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 // import hookIcon  from "../assets/fishing.svg"
 import fishFillIcon  from "../../assets/fish-fill-food.svg"
 
 const mapContainer = ref(null);
 
 const fishingSpotList = ref([]);
+const filteredSpotList = ref([]);
 
 const fishingSpotDetiles = ref({});
 
-const emit = defineEmits(['openDailog'])
+const emit = defineEmits(['openDailog','updateDailog'])
+
+const props = defineProps(['spotId','updateSpot'])
+
 
 const getfishSpot = async() => {
   try{
@@ -27,9 +31,53 @@ const getfishSpot = async() => {
     
   
 }
-// const shrimpingSpotList = ref([]);
-// const fishingTackleShopList =ref([])
 
+
+
+watch(() => props.updateSpot,async (newVal,oldVal) => {
+  
+  await getfishSpot()
+
+  console.log('spotById update',props.spotId)
+  console.log('newVal',newVal,oldVal)
+
+  const spot = fishingSpotList.value.find(e => e._id == newVal)
+  fishingSpotDetiles.value = spot
+})
+
+const coordinateDistance = (lat1, lon1, lat2, lon2) => {
+  // Convert degrees to radians
+  const radLat1 = lat1 * Math.PI / 180;
+  const radLon1 = lon1 * Math.PI / 180;
+  const radLat2 = lat2 * Math.PI / 180;
+  const radLon2 = lon2 * Math.PI / 180;
+  // Radius of the Earth in meters
+  const R = 6_371_000; // m
+  // Differences in coordinates
+  const dLat = radLat2 - radLat1;
+  const dLon = radLon2 - radLon1;
+  // Haversine formula
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(radLat1) * Math.cos(radLat2) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const distance = R * c;
+  return distance.toFixed(2); // Return distance rounded to 2 decimal places
+};
+
+const filterSpot = (center) => {
+  let newList = fishingSpotList.value.map(spot => {
+    let distance = coordinateDistance(spot.locations.coordinates[0],spot.locations.coordinates[1],center.lat,center.lng)
+    return {...spot,distance}
+  })
+  newList.sort((x,y) => x.distance - y.distance)
+  if(newList.length<20){
+    filteredSpotList.value = newList
+  }else{
+    filteredSpotList.value = newList.slice(0,21)
+  }
+  // console.log('filteredSpotList',filteredSpotList.value)
+}
 
 
 onMounted( async() => {
@@ -71,25 +119,10 @@ onMounted( async() => {
 
   let SpotList = []
 
-  console.log('fishingSpotList.value',fishingSpotList.value)
+  // console.log('fishingSpotList.value',fishingSpotList.value)
 
-//   const popupTemplate = (item) => {
-//     return`
-//             <div class="p-0 mb-2">
-//               <img class="w-full" src="${item.imageUrl}" alt="${item.name}">
-//             </div>
-//             <div class="flex flex-col gap-y-1.5 p-1">
-//               <h3 class="text-2xl font-semibold leading-none tracking-tight">${item.name}</h3>
-//               <p class="text-sm text-muted-foreground">${item.description}</p>
-//             </div>
-//             <div class="items-center p-6 pt-0 flex justify-between px-6 pb-6">
-//               <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"> 
-//                 釣點詳細 
-//               </button>
-//               <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">Deploy</button>
-//             </div>
-//             `
-//   }
+  
+
 
   fishingSpotList.value.forEach(item => {
       let spotMarker = L.marker(item.locations.coordinates.reverse(),{icon:fishingIcon})
@@ -103,7 +136,7 @@ onMounted( async() => {
     
   var fishingSpot = L.layerGroup(SpotList);
 
-  console.log('fishingSpot',fishingSpot)
+  // console.log('fishingSpot',fishingSpot)
 
 
   var overlayMaps = {
@@ -156,23 +189,28 @@ onMounted( async() => {
 
   map.locate({setView: true, maxZoom: 16, enableHighAccuracy: true});
 
-  function onLocationFound(e) {
-    console.log(e)
-    // var radius = e.accuracy;
+  // function onLocationFound(e) {
+  //   // console.log(e)
+  //   // var radius = e.accuracy;
 
-    // L.marker(e.latlng).addTo(map)
-        // .bindPopup("You are within " + radius + " meters from this point").openPopup();
+  //   // L.marker(e.latlng).addTo(map)
+  //       // .bindPopup("You are within " + radius + " meters from this point").openPopup();
 
-    // L.circle(e.latlng, radius).addTo(map);
-  }
+  //   // L.circle(e.latlng, radius).addTo(map);
+  // }
 
-    map.on('locationfound', onLocationFound);
+    // map.on('locationfound', onLocationFound);
 
     function onLocationError(e) {
         alert(e.message);
     }
 
     map.on('locationerror', onLocationError);
+
+    function onMoveend(){
+      filterSpot(map.getCenter())
+    }
+  map.on('moveend',onMoveend)
 });
 </script>
 
