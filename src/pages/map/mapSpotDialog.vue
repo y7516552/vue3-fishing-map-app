@@ -1,5 +1,6 @@
 <script setup>
-import axios from 'axios';
+// import axios from 'axios';
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogScrollContent,
@@ -16,20 +17,34 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel'
-import { CircleAlert,FishOff ,ThermometerSun,MapPinned,ThumbsUp} from 'lucide-vue-next'
+import { CircleAlert,FishOff ,ThermometerSun,MapPinned,ThumbsUp ,LoaderCircle} from 'lucide-vue-next'
 import { AspectRatio } from '@/components/ui/aspect-ratio'
 import StarRating from 'vue-star-rating'
 import ReviewsAuthor from './reviews/ReviewsAuthor.vue'
 
 
 import { inject ,ref, watch} from 'vue'
+import { useUserStore }from'../../stores/user'
+import { storeToRefs } from 'pinia'
+
+const store = useUserStore()
+const { isLogin ,userData} = storeToRefs(store)
 
 const emit = defineEmits(['likeSpot','dislikeSpot','createReview','updateReview'])
 
-const loading = ref(false)
+const loading = ref(true)
 
 const spotData = inject('spotData')
 const dailogOpen = inject('dailogOpen')
+
+watch(dailogOpen,() => {
+  if(dailogOpen.value){
+    loading.value = true
+    setTimeout(()=>{
+      loading.value = false
+    },1500)
+  }
+})
 
 watch(spotData,() => {
   console.log('update')
@@ -55,11 +70,11 @@ const spotRating = (rewiews) => {
 
 const likeSpot = async (id) => {
   try{
-    // loading.value = true
+    loading.value = true
     // let apiUrl = `http://localhost:3000/api/v1/fishingSpot/${id}/like`
     // const { data } = await axios.get(apiUrl)
     // console.log('data',data)
-
+    console.log('userData',userData.value._id)
     emit('likeSpot',id)
     
   }catch(err) {
@@ -83,6 +98,7 @@ const dislikeSpot = async (id) => {
     loading.value = false
   }
 }
+
 
 
 </script>
@@ -139,14 +155,17 @@ const dislikeSpot = async (id) => {
                 >
                   <MapPinned size="32"/>
                 </a>
-                <ThumbsUp @click="likeSpot(spotData._id)" size="32" class="mr-4"/>
-                <ThumbsUp @click="dislikeSpot(spotData._id)" fill="" size="32" class="mr-4"/>
+                <!-- <template v-if="spotData.likes.includes()"></template> -->
+                <ThumbsUp  @click="likeSpot(spotData._id)" size="32" class="mr-4"/>
+                <ThumbsUp v-if="isLogin&&spotData.likes.includes(userData._id)" @click="dislikeSpot(spotData._id)" fill="" size="32" class="mr-4"/>
               </div>
             </div>
           </DialogHeader>
 
           <DialogFooter class="mx-6 mb-6">
-            
+            <Button v-if="isLogin" variant="outline">
+              新增評論
+            </Button>
           </DialogFooter>
 
           <div class=" mt-6 grid gap-6 py-4 px-6 border-t-1">
@@ -187,6 +206,9 @@ const dislikeSpot = async (id) => {
                 </Carousel>
               </div>
             </div>
+          </div>
+          <div class="loading bg-gray-800 opacity-50 absolute bottom-0 left-0 w-full h-full  justify-center items-center " :class="[loading ? 'flex':'hidden']">
+            <LoaderCircle size="128" color="white" class="mr-3 animate-spin"/>
           </div>
         </DialogScrollContent>
     </DialogOverlay>

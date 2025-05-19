@@ -24,6 +24,8 @@ const dailogOpen = ref(false)
 provide('spotData', tempSpotData)
 provide('dailogOpen', dailogOpen)
 
+
+
 const getSpotData = (e) => {
   updateSpot.value = false
   tempSpotData.value = e

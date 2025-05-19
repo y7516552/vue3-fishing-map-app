@@ -29,11 +29,22 @@ import {
   Sparkles,
 } from 'lucide-vue-next';
 
-const props = defineProps({
-  user: { type: Object, required: true },
-});
 
+const emit = defineEmits(['logout'])
+const logout = () => {
+  emit('logout')
+}
+
+const props = defineProps({
+  user: { 
+    name:{ type: String },
+    email:{ type: String },
+    avatarUrl:{ type: String },
+  },
+});
 const { isMobile } = useSidebar();
+
+
 </script>
 
 <template>
@@ -46,7 +57,8 @@ const { isMobile } = useSidebar();
             class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
           >
             <Avatar class="h-8 w-8 rounded-lg">
-              <AvatarImage :src="user.avatar" :alt="user.name" />
+              <AvatarImage v-if="user.avatarUrl" :src="user.avatarUrl" :alt="user.name" />
+              <div v-else class="bg-gray-500"></div>
               <AvatarFallback class="rounded-lg"> CN </AvatarFallback>
             </Avatar>
             <div class="grid flex-1 text-left text-sm leading-tight">
@@ -57,7 +69,7 @@ const { isMobile } = useSidebar();
           </SidebarMenuButton>
         </DropdownMenuTrigger>
         <DropdownMenuContent
-          class="w-[--reka-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+          class="w-[--reka-dropdown-menu-trigger-width] min-w-56 rounded-lg z-1000"
           :side="isMobile ? 'bottom' : 'right'"
           align="end"
           :side-offset="4"
@@ -65,7 +77,8 @@ const { isMobile } = useSidebar();
           <DropdownMenuLabel class="p-0 font-normal">
             <div class="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
               <Avatar class="h-8 w-8 rounded-lg">
-                <AvatarImage :src="user.avatar" :alt="user.name" />
+                <AvatarImage v-if="user.avatarUrl" :src="user?.avatarUrl" :alt="user.name" />
+                <div v-else class="bg-gray-500"></div>
                 <AvatarFallback class="rounded-lg"> CN </AvatarFallback>
               </Avatar>
               <div class="grid flex-1 text-left text-sm leading-tight">
@@ -97,7 +110,7 @@ const { isMobile } = useSidebar();
             </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>
+          <DropdownMenuItem @click="logout">
             <LogOut />
             Log out
           </DropdownMenuItem>

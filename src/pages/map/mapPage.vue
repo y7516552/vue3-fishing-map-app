@@ -34,6 +34,8 @@ const getfishSpot = async() => {
 
 
 
+
+
 watch(() => props.updateSpot,async (newVal,oldVal) => {
   
   await getfishSpot()

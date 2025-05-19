@@ -6,6 +6,7 @@ export const description
 
 <script setup>
 import AppSidebar from '@/components/AppSidebar.vue'
+import LoginDialog from '../LoginDialog.vue'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -31,13 +32,19 @@ const getBreadcrumbList = () => {
 }
 getBreadcrumbList()
 
-
+const openLoginDialog= ref(false)
+const openDailog = () => {
+  openLoginDialog.value = true
+}
+const closeDialog = () => {
+  openLoginDialog.value = false
+}
 </script>
 
 <template>
   <main>
     <SidebarProvider>
-    <AppSidebar />
+    <AppSidebar @openLoginDialog="openDailog" />
     <SidebarInset>
       <header class="flex h-16 shrink-0 items-center gap-2 border-b px-4">
         <SidebarTrigger class="-ml-1" />
@@ -59,7 +66,14 @@ getBreadcrumbList()
         </Breadcrumb>
       </header>
 
-      <RouterView />
+      
+      <RouterView v-slot="{ Component }">
+        <Transition>
+          <component :is="Component" />
+        </Transition>
+      </RouterView>
+      
+      <LoginDialog :openLoginDialog="openLoginDialog" @closeLoginDialog="closeDialog"/>
       
     </SidebarInset>
   </SidebarProvider>
@@ -69,5 +83,14 @@ getBreadcrumbList()
 <style>
 SidebarProvider{
   z-index: 1000;
+}
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
 }
 </style>

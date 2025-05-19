@@ -15,9 +15,29 @@ import {
   BookOpen,
   FishSymbol,
   Map,
-  Settings2,
-  SquareTerminal,
+  BadgeInfo,
+  // Settings2,
+  // SquareTerminal,
 } from 'lucide-vue-next';
+import { useUserStore }from'../stores/user'
+import { storeToRefs } from 'pinia'
+import {   watch } from 'vue';
+
+const store = useUserStore()
+const { check ,logout} = store
+const { isLogin, userData } = storeToRefs(store)
+check()
+
+watch(isLogin,()=>{
+
+})
+
+const emit = defineEmits(['openLoginDialog'])
+const openLoginDialog = () => {
+  emit('openLoginDialog',true);
+}
+
+
 
 const props = defineProps({
   side: { type: String, required: false },
@@ -43,6 +63,11 @@ const data = {
   ],
   navMain: [
     {
+      title: '首頁',
+      url: '/',
+      icon: FishSymbol,
+    },
+    {
       title: '地圖',
       url: '/map',
       icon: Map,
@@ -50,7 +75,7 @@ const data = {
     {
       title: '相關資訊',
       url: '/info',
-      icon: BookOpen,
+      icon: BadgeInfo,
       items: [
         {
           title: '資訊一覽',
@@ -62,11 +87,11 @@ const data = {
         },
         {
           title: '釣具店',
-          url: '#',
+          url: '/info/fishingTackleShop',
         },
         {
           title: '魚種',
-          url: '#',
+          url: '/info/species',
         },
       ],
     },
@@ -75,15 +100,15 @@ const data = {
       url: '/about',
       icon: BookOpen,
     },
-    {
-      title: '社群',
-      url: '/community',
-      icon: SquareTerminal,
-    },
-    {
-      title: '設定',
-      url: '#',
-      icon: Settings2,
+    // {
+    //   title: '社群',
+    //   url: '/community',
+    //   icon: SquareTerminal,
+    // },
+    // {
+      // title: '設定',
+      // url: '#',
+      // icon: Settings2,
       // items: [
       //   {
       //     title: 'General',
@@ -102,7 +127,7 @@ const data = {
       //     url: '#',
       //   },
       // ],
-    },
+    // },
   ],
 };
 </script>
@@ -117,7 +142,8 @@ const data = {
       <!-- <NavProjects :projects="data.projects" /> -->
     </SidebarContent>
     <SidebarFooter>
-      <NavUser :user="data.user" />
+      <NavUser v-if="isLogin" :user="userData"  @logout="logout"/>
+      <button v-if="!isLogin" type="button" @click="openLoginDialog">登入</button>
     </SidebarFooter>
     <SidebarRail />
   </Sidebar>
