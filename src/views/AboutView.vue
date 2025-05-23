@@ -17,6 +17,10 @@ import { Github, Mail } from 'lucide-vue-next';
     </div>
 
     <div class="mb-6 flex flex-col justify-center items-center gap-4">
+      <p>參考資料:   <a href="https://fishdb.sinica.edu.tw/">臺灣魚類資料庫</a></p>
+    </div>
+
+    <div class="mb-6 flex flex-col justify-center items-center gap-4">
       <Avatar class="w-[64px] h-[64px] mb-6">
         <AvatarImage class="w-[64px] h-[64px]" src="" alt="" />
         <AvatarFallback class="w-[64px] h-[64px]">阿德</AvatarFallback>

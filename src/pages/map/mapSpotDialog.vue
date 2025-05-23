@@ -21,6 +21,7 @@ import { CircleAlert,FishOff ,ThermometerSun,MapPinned,ThumbsUp ,LoaderCircle} f
 import { AspectRatio } from '@/components/ui/aspect-ratio'
 import StarRating from 'vue-star-rating'
 import ReviewsAuthor from './reviews/ReviewsAuthor.vue'
+import MessageDialog from '@/components/MessageDialog.vue'
 
 
 import { inject ,ref, watch} from 'vue'
@@ -50,6 +51,13 @@ watch(spotData,() => {
   console.log('update')
 })
 
+const openMsg = ref(false)
+const MsgData = ref({
+    title:'',
+    description:'',
+    status:'success'
+})
+
 const windyUrl = ([lat,lon]) => {
   return`https://www.windy.com/${lat}/${lon}?waves,${lat},${lon},16`
   // return`https://embed.windy.com/embed2.html?lat=${lat}&lon=${lon}&detailLat=${lat}&detailLon=${lon}&zoom=11&level=surface&overlay=waves&product=ecmwfWaves&calendar=now&type=map&location=coordinates&detail=true&metricWind=default&metricTemp=default&radarRange=-1`
@@ -66,6 +74,17 @@ const spotRating = (rewiews) => {
     totalScore += e.rating
   });
   return (totalScore / rewiews.length)
+}
+
+const loginYet = () => {
+  if(!isLogin.value){
+    openMsg.value = true
+    MsgData.value = {
+        title:'請先登入',
+        description:'登入才能使用此功能',
+        status:'danger'
+    }
+  }
 }
 
 const likeSpot = async (id) => {
@@ -156,14 +175,18 @@ const dislikeSpot = async (id) => {
                   <MapPinned size="32"/>
                 </a>
                 <!-- <template v-if="spotData.likes.includes()"></template> -->
-                <ThumbsUp  @click="likeSpot(spotData._id)" size="32" class="mr-4"/>
                 <ThumbsUp v-if="isLogin&&spotData.likes.includes(userData._id)" @click="dislikeSpot(spotData._id)" fill="" size="32" class="mr-4"/>
+                <ThumbsUp v-if="isLogin" @click="likeSpot(spotData._id)" size="32" class="mr-4"/>
+                <ThumbsUp v-else @click="loginYet()" size="32" class="mr-4" color="#5c5c5c"/>
               </div>
             </div>
           </DialogHeader>
 
           <DialogFooter class="mx-6 mb-6">
             <Button v-if="isLogin" variant="outline">
+              新增評論
+            </Button>
+            <Button v-else variant="outline" disabled>
               新增評論
             </Button>
           </DialogFooter>
@@ -210,6 +233,7 @@ const dislikeSpot = async (id) => {
           <div class="loading bg-gray-800 opacity-50 absolute bottom-0 left-0 w-full h-full  justify-center items-center " :class="[loading ? 'flex':'hidden']">
             <LoaderCircle size="128" color="white" class="mr-3 animate-spin"/>
           </div>
+          <MessageDialog class="z-1000" :data="MsgData" :open="openMsg" @close="()=> {openMsg=false}"></messageDialog>
         </DialogScrollContent>
     </DialogOverlay>
   </Dialog>

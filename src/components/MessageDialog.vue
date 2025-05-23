@@ -27,8 +27,8 @@ const updateState = (e) => {
 </script>
 
 <template>
-  <AlertDialog v-model:open="isOpen" @update:open="updateState">
-    <AlertDialogContent :class="[props.status=='success'?'bg-green-200':'bg-red-200']">
+  <AlertDialog v-model:open="isOpen" @update:open="updateState" class="z-1000">
+    <AlertDialogContent :class="[props.status=='success'?'bg-green-200':'bg-red-200']" class="z-1000">
       <AlertDialogHeader>
         <AlertDialogTitle>{{ props.data.title }}</AlertDialogTitle>
         <AlertDialogDescription>

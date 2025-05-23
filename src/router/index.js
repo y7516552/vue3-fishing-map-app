@@ -6,9 +6,13 @@ import CommunityView from '@/views/CommunityView.vue'
 import InfoView from '@/views/InfoView.vue'
 import InfoPage from '@/pages/info/InfoPage.vue'
 import FishingSpots from '@/pages/info/FishingSpotsPage.vue'
+import FishingTackleShop from '@/pages/info/FishingTackleShopPage.vue'
+import Species from '@/pages/info/SpeciesPage.vue'
+import ErrorPage from '@/pages/ErrorPage.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    { path: '/:pathMatch(.*)*', name: 'NotFound', component: ErrorPage },
     {
       path: '/',
       component: HomeLayout,
@@ -68,6 +72,22 @@ const router = createRouter({
                 title:"釣點資訊",
               },
               component: FishingSpots,
+            },
+            {
+              path: '/info/fishingTackleShop',
+              name: 'fishingTackleShop',
+              meta:{
+                title:"釣具店",
+              },
+              component: FishingTackleShop,
+            },
+            {
+              path: '/info/species',
+              name: 'species',
+              meta:{
+                title:"魚種",
+              },
+              component: Species,
             }
           ]
         },

@@ -5,6 +5,7 @@ import "leaflet/dist/leaflet.css";
 import { onMounted, ref, watch } from "vue";
 // import hookIcon  from "../assets/fishing.svg"
 import fishFillIcon  from "../../assets/fish-fill-food.svg"
+import { toast } from 'vue-sonner'
 
 const mapContainer = ref(null);
 
@@ -25,8 +26,11 @@ const getfishSpot = async() => {
     
     fishingSpotList.value = data.result
   
-  }catch(err) {
-    console.log( err)
+  }catch(error) {
+    console.log( error)
+    toast.warning('資料取得失敗', {
+      description: error,
+    })
   }
     
   

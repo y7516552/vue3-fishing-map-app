@@ -3,6 +3,7 @@
 
 import {
   Dialog,
+  DialogOverlay,
   DialogContent,
   DialogDescription,
   DialogTitle,
@@ -52,12 +53,14 @@ const loginFail = () => {
 </script>
 
 <template>
-  <Dialog v-model:open="openDialog" @update:open="updateDialogState">
-    <DialogContent>
-      <DialogTitle>登入</DialogTitle>
-      <DialogDescription></DialogDescription>
-      <LoginForm @loginSubmitted="loginSubmitted" @loginFail="loginFail"/>
-    </DialogContent>
-    <messageDialog :data="MsgData" :open="openMsg" @close="()=> {openMsg=false}"></messageDialog>
+  <Dialog v-model:open="openDialog" @update:open="updateDialogState" >
+    <DialogOverlay  class="z-1000">
+      <DialogContent class="z-1000">
+        <DialogTitle>登入</DialogTitle>
+        <DialogDescription></DialogDescription>
+        <LoginForm @loginSubmitted="loginSubmitted" @loginFail="loginFail"/>
+      </DialogContent>
+      <messageDialog class="z-1000" :data="MsgData" :open="openMsg" @close="()=> {openMsg=false}"></messageDialog>
+    </DialogOverlay>
   </Dialog>
 </template>
