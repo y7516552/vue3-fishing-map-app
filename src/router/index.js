@@ -9,10 +9,14 @@ import FishingSpots from '@/pages/info/FishingSpotsPage.vue'
 import FishingTackleShop from '@/pages/info/FishingTackleShopPage.vue'
 import Species from '@/pages/info/SpeciesPage.vue'
 import ErrorPage from '@/pages/ErrorPage.vue'
+import AdminLayout from '@/components/layout/AdminLayout.vue'
+import DashboardPage from '@/pages/dashboard/dashboardPage.vue'
+import NoAccessPage from '@/pages/NoAccessPage.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     { path: '/:pathMatch(.*)*', name: 'NotFound', component: ErrorPage },
+    { path: '/NoAccess', name: 'NoAccess', component: NoAccessPage },
     {
       path: '/',
       component: HomeLayout,
@@ -93,6 +97,23 @@ const router = createRouter({
         },
       ]
     },
+    {
+      path: '/admin/dashboard',
+      component: AdminLayout,
+      meta:{
+        title:"管理",
+      },
+      children:[
+        {
+          path: '/admin/dashboard/:type',
+          name: 'dashboard',
+          meta:{
+            title:"首頁",
+          },
+          component: DashboardPage,
+        },
+      ]
+    }
   ],
 })
 

@@ -5,6 +5,7 @@ import "leaflet/dist/leaflet.css";
 import { onMounted, ref, watch } from "vue";
 // import hookIcon  from "../assets/fishing.svg"
 import fishFillIcon  from "../../assets/fish-fill-food.svg"
+import storeIcon from '../../assets/store.svg'
 import { toast } from 'vue-sonner'
 
 const mapContainer = ref(null);
@@ -35,6 +36,25 @@ const getfishSpot = async() => {
     
   
 }
+
+const fishingTackleShopList = ref([])
+
+const  getFishingTackleShops = async () => {
+    try {
+      let apiUrl = 'http://localhost:3000/api/v1/fishingTackleShop'
+      const { data } = await axios.get(apiUrl)
+        
+
+        fishingTackleShopList.value = data.result
+
+    } catch (error) {
+        console.log(error)
+        toast.warning('資料取得失敗')
+    }
+      
+    
+
+  }
 
 
 
@@ -88,6 +108,7 @@ const filterSpot = (center) => {
 
 onMounted( async() => {
   await getfishSpot()
+  await getFishingTackleShops()
 
   const fishingIcon = L.icon({
     iconUrl: fishFillIcon,
@@ -99,7 +120,17 @@ onMounted( async() => {
     // iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
     // shadowAnchor: [4, 62],  // the same for the shadow
     popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
-});
+  });
+
+  const fishingStore = L.icon({
+    iconUrl: storeIcon,
+    iconSize:     [38, 95], // size of the icon
+    // shadowSize:   [50, 64], // size of the shadow
+    iconAnchor:   [22, 30], // point of the icon which will correspond to marker's location
+    // iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
+    // shadowAnchor: [4, 62],  // the same for the shadow
+    popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+  });
 
   const Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
 	  attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
@@ -140,14 +171,35 @@ onMounted( async() => {
       SpotList.push(spotMarker)
   });
     
-  var fishingSpot = L.layerGroup(SpotList);
+  const fishingSpot = L.layerGroup(SpotList);
 
-  // console.log('fishingSpot',fishingSpot)
+  let StoreList = []
+  fishingTackleShopList.value.forEach(item => {
+      let spotMarker = L.marker(item.locations.coordinates.reverse(),{icon:fishingStore})
+      .bindPopup(
+        `
+        <p class="text-xl font-bold mb-4">${item.name}</P>
+          <p class="my-1">電話: ${item.phone}</p>
+          <p class="my-1">地址: ${item.address}</p>
+          <p class="my-1">Google map: <a href="${item.googleMapsUri}" target="_blank" >連結</a></p>
+        `,
+        {minWidth:400,maxWidth:600,maxHeight:160,offset:[100,200]}
+      )
+      .on('click', function() {
+        // fishingSpotDetiles.value = item 
+        // emit('openDailog', item)
+      });
+      StoreList.push(spotMarker)
+  });
+
+  const fishingTackleShop = L.layerGroup(StoreList);
+
+  // console.log('fishingTackleShopList.value',fishingTackleShopList.value)
 
 
   var overlayMaps = {
     "釣點": fishingSpot,
-    // "釣具店":[],
+    "釣具店":fishingTackleShop,
     // "釣蝦場":[],
     // "釣魚池":[]
   };
@@ -216,7 +268,7 @@ onMounted( async() => {
     function onMoveend(){
       filterSpot(map.getCenter())
     }
-  map.on('moveend',onMoveend)
+    map.on('moveend',onMoveend)
 });
 </script>
 

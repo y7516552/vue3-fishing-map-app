@@ -3,6 +3,7 @@ import {Search, RotateCw, LoaderCircle, MessageCircleMore, ThumbsUp } from 'luci
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { AspectRatio } from '@/components/ui/aspect-ratio'
+import { Badge } from '@/components/ui/badge'
 import {
   Card,
   CardContent,
@@ -12,13 +13,24 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { useFishingSpot } from '@/composable/fishingSpot'
-import { onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
+
+const cityList = ["全部","基隆市", "臺北市", "新北市", "桃園市", "新竹市", "新竹縣", "苗栗縣", "臺中市", "彰化縣", "南投縣", "雲林縣", "嘉義市", "嘉義縣", "基隆市", "臺南市", "高雄市", "屏東縣", "宜蘭縣", "花蓮縣", "臺東縣", "澎湖縣"]
+const city = ref("全部")
+const fishingSpotList = ref({})
+
+cityList.forEach((e) => {
+  fishingSpotList.value[e]=[]
+})
 
 const {loading, fishingSpots, getFishingSpots } = useFishingSpot()
 onMounted(async()=>{
   await getFishingSpots()
   console.log('fishingSpots',fishingSpots.value)
+  fishingSpotList.value["全部"] =[...fishingSpots.value]
 })
+
+
 
 </script>
 
@@ -36,6 +48,9 @@ onMounted(async()=>{
         <RotateCw />
       </Button>
     </div>
+    <div class="flex gap-4 flex-wrap p-4">
+      <Button v-for="item in cityList" :key="item" @click="city=item" class="" :variant="city===item ? 'outline' : ''"> {{item}}</Button>
+    </div>
     <div class="flex flex-1 flex-col gap-4 p-4">
       <div class="grid auto-rows-min gap-4 md:grid-cols-3">
         <Card v-for="item in fishingSpots" :key="item._id" class="aspect-video rounded-xl bg-muted/50 pt-0 pb-4">
@@ -49,7 +64,7 @@ onMounted(async()=>{
             <CardDescription>{{ item.description }}</CardDescription>
           </CardHeader>
           <CardContent>
-            Card Content
+            <Badge >{{ item.city }}</Badge>
           </CardContent>
           <CardFooter class="justify-center">
             <div class=" w-100 flex gap-6 justify-around">
