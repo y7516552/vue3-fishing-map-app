@@ -1,6 +1,7 @@
 <script setup>
 import axios from 'axios';
 import dashboardSearchbar from './dashboardSearchbar.vue';
+import DashboardUpdateDialog from './dashboardUpdateDialog.vue';
 import DashboardMessageDialog from './dashboardMessageDialog.vue';
 import {
   Table,
@@ -34,6 +35,47 @@ const tableHead =[
 ]
 
 const dataType = route.params.type
+
+const dataForm = {
+  fishingTackleShop:{
+    placesId:"",
+    address:"",
+    googleMapsUri:"",
+    name:"",
+    phone:"",
+    locations:{
+      type: "Point",
+      coordinates: [0,0],
+    },
+    city:""
+  },
+  fishingSpot:{
+    name:"",
+    description:"",
+    imageUrl:"",
+    imageUrlList:"",
+    type:"",
+    fishingAllowed: true,
+    locations:{
+      type: "Point",
+      coordinates: [0,0],
+    },
+    city:""
+  },
+  species:{
+    CommonName:"",
+    ScientificName:"",
+    imageUrl:"",
+    fishDBUrl:"",
+  },
+  report:{
+    type:"",
+    title:"",
+    description:"",
+    imageUrlList:"",
+  }
+}
+
 const pageData = ref([])
 const pageFillterdData = ref([])
 const loading = ref(false)
@@ -83,8 +125,10 @@ const fillerData = (search={query:"",city:""}) => {
   })
 
   const openUpdate = ref(false)
-  
+  const updateData = ref({})
   const openUpdateDialog = (type = 'create', data ) => {
+    updateData.value = dataForm[dataType]
+    if(type=='edit') updateData.value = data
     openUpdate.value = true
   }
 
@@ -127,7 +171,7 @@ const fillerData = (search={query:"",city:""}) => {
   <div>
     <div class="flex p-4" >
       <dashboardSearchbar :selectField="selectField" @search-update="fillerData"/>
-      <Button class="ml-auto mr-0"> 
+      <Button @click="openUpdateDialog" class="ml-auto mr-0"> 
         <CirclePlus/>
         新增 
       </Button>
@@ -168,7 +212,7 @@ const fillerData = (search={query:"",city:""}) => {
               {{ item.status }}
             </TableCell>
             <TableCell class="text-center">
-              <Button variant="outline">
+              <Button @click="openUpdateDialog('edit',item)" variant="outline">
                 <SquarePen/>
               </Button>
               <Button @click="openDeleteDialog(item)" variant="destructive">
@@ -179,6 +223,7 @@ const fillerData = (search={query:"",city:""}) => {
         </TableBody>
       </Table>
     </div>
+    <DashboardUpdateDialog :openUpdateDialog="openUpdate" :data="updateData" ></DashboardUpdateDialog>
     <DashboardMessageDialog :data="MsgData" :open="openMsg" @close="()=> {openMsg=false}" @deleteItem="deleteItem"></DashboardMessageDialog>
   </div>
 </template>
