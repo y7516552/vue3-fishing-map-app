@@ -10,9 +10,11 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
+  CardAction,
 } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { MapPinned , LoaderCircle } from 'lucide-vue-next'
+import { MapPinned , LoaderCircle ,Info} from 'lucide-vue-next'
+import MessageDialog from '@/components/MessageDialog.vue'
 
 const apiUrl = 'http://localhost:3000/api/v1/fishingTackleShop'
 const fishingTackleShops =ref({})
@@ -57,12 +59,15 @@ const  getFishingTackleShops = async () => {
       <Button v-for="item in cityList" :key="item" @click="city=item" class="" :variant="city===item ? 'outline' : ''"> {{item}}</Button>
     </div>
     <div class="flex flex-1 flex-col gap-4 p-4">
-      <div class="grid auto-rows-min gap-4 lg:grid-cols-4 md:grid-cols-2 ">
+      <div class="grid auto-rows-min gap-4 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 ">
         <Card v-for="item in fishingTackleShops[city]" :key="item._id" class="aspect-video rounded-xl bg-muted/50 pt-4 pb-4">
           <CardHeader>
             <CardTitle class="mb-3">{{item.name}}</CardTitle>
             <CardDescription>電話:  {{ item.phone }}</CardDescription>
             <CardDescription>地址:  {{ item.address }}</CardDescription>
+            <CardAction>
+              <Info/>
+            </CardAction>
           </CardHeader>
           <CardContent>
             <Badge >{{ item.city }}</Badge>
@@ -87,5 +92,6 @@ const  getFishingTackleShops = async () => {
     <div class="loading bg-gray-800 opacity-50 absolute bottom-0 left-0 w-full h-full  justify-center items-center " :class="[loading ? 'flex':'hidden']">
       <LoaderCircle size="128" color="white" class="mr-3 animate-spin"/>
     </div>
+    <MessageDialog class="z-1000" :data="MsgData" :open="openMsg" @close="()=> {openMsg=false}"></messageDialog>
   </div>
 </template>

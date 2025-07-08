@@ -1,5 +1,6 @@
 <script setup>
 import axios from 'axios';
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
@@ -7,10 +8,16 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
+  CardAction,
 } from '@/components/ui/card'
 import { AspectRatio } from '@/components/ui/aspect-ratio'
 import { ref, onMounted } from 'vue'
 import { toast } from 'vue-sonner'
+import {Info} from 'lucide-vue-next';
+import MessageDialog from '@/components/MessageDialog.vue'
+import ReportDialog from '@/components/ReportDialog.vue'
+import { useUserStore }from'../../stores/user'
+import { storeToRefs } from 'pinia'
 
 const apiUrl = 'http://localhost:3000/api/v1/species'
 const species = ref([])
@@ -36,10 +43,44 @@ const  getSpecies = async () => {
   onMounted(async()=>{
     await getSpecies()
   })
+
+  const store = useUserStore()
+  const { isLogin, userData} = storeToRefs(store)
+  const openMsg = ref(false)
+  const MsgData =ref({
+    title:'',
+    description:'',
+    status:''
+  })
+  const openReport = ref(false)
+
+  const openReportDialog = () =>{
+    if(!isLogin.value){
+      MsgData.value = {
+        title:'請先登入',
+        description:'登入才能使用此功能',
+        status:'danger'
+      }
+      openMsg.value = true
+    }else{
+
+      openReport.value = true
+    }
+  }
+
+  const sendReport = (data) => {
+    openReport.value = false
+    console.log(data,userData)
+  }
+
+
 </script>
 
 <template>
   <div>
+    <div>
+      <Button @click="openReportDialog">搜尋</Button>
+    </div>
     <div class="p-4">
       <p>資料取自: <a class="text-blue-600" href="https://fishdb.sinica.edu.tw"> 台灣魚類資料庫 </a></p>
     </div>
@@ -49,6 +90,9 @@ const  getSpecies = async () => {
           <CardHeader>
             <CardTitle class="mb-3">{{item.CommonName}}</CardTitle>
             <CardDescription>學名:  {{item.ScientificName}}</CardDescription>
+            <CardAction @click="openReportDialog">
+              <Info/>
+            </CardAction>
           </CardHeader>
           <CardContent>
             <div class="w-full">
@@ -72,6 +116,8 @@ const  getSpecies = async () => {
       </div>
       <div class="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" ></div>
     </div>
+    <MessageDialog class="z-1000" :data="MsgData" :open="openMsg" @close="()=> {openMsg=false}"></MessageDialog>
+    <ReportDialog class="z-1000"  :open="openReport" @close="()=> {openReport=false}" @sendReport="sendReport"></ReportDialog>
   </div>
 </template>
 
