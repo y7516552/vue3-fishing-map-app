@@ -1,5 +1,6 @@
 <script setup>
 import axios from 'axios';
+import { useCookies } from '@vueuse/integrations/useCookies'
 import dashboardSearchbar from './dashboardSearchbar.vue';
 import DashboardUpdateDialog from './dashboardUpdateDialog.vue';
 import DashboardMessageDialog from './dashboardMessageDialog.vue';
@@ -33,7 +34,7 @@ const tableHead =[
   "action"
 ]
 
-const dataType = ref('fishingSpot')
+const dataType = ref('report')
 
 const dataForm = {
   fishingTackleShop:{
@@ -80,12 +81,21 @@ const pageFillterdData = ref([])
 const loading = ref(false)
 
 const baseApiUrl=import.meta.env.VITE_APP_API_URL//+"admin/"
+const cookies = useCookies(['fishingMap'])
+const token = cookies.getAll().fishingMap
+
+const reportAPI = axios.create({
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      Accept: "application/json",
+      Authorization:`${token}`
+    },
+});
 
 const fetchData = async(type) => {
-    let apiUrl =baseApiUrl+type
     loading.value = true
     try {
-        const { data } = await axios.get(apiUrl)
+        const { data } = await reportAPI.get(baseApiUrl+type)
         
         pageData.value = data.result
         pageFillterdData.value = data.result
@@ -93,7 +103,8 @@ const fetchData = async(type) => {
     } catch (error) {
         console.log(error)
         if(error.status === 403) {
-            router.push({name: 'NoAccess'})
+          console.log('403')
+            // router.push({name: 'NoAccess'})
         }else{
             toast.warning('資料取得失敗')
             loading.value = false
@@ -176,32 +187,16 @@ const fillerData = (search={query:"",city:""}) => {
       </Button>
     </div>
     <div class="p-4">
-      openUpdate:{{ openUpdate }}
       <Table>
         <TableCaption>A list of {{ dataType }}.</TableCaption>
         <TableHeader>
           <TableRow>
             <TableHead v-for="item in tableHead" :key="item" >{{ item }}</TableHead>
-            <!-- <TableHead class="w-[100px]">
-              Invoice
-            </TableHead>
-            <TableHead>Method</TableHead>
-            <TableHead class="text-right">
-              Amount
-            </TableHead> -->
+           
           </TableRow>
         </TableHeader>
-        <TableBody>
-          <!-- <TableRow>
-            <TableCell class="font-medium">
-              INV001
-            </TableCell>
-            <TableCell>Paid</TableCell>
-            <TableCell>Credit Card</TableCell>
-            <TableCell class="text-right">
-              $250.00
-            </TableCell>
-          </TableRow> -->
+        <TableBody v-if="pageFillterdData.length!==0">
+          
           <TableRow v-for="item in pageFillterdData" :key="item._id">
             <TableCell class="font-medium">
               {{ item.name }}
@@ -212,12 +207,19 @@ const fillerData = (search={query:"",city:""}) => {
               {{ item.status }}
             </TableCell>
             <TableCell class="text-center">
-              <Button class="mx-2" @click="openUpdateDialog('edit',item)" variant="outline">
+              <Button @click="openUpdateDialog('edit',item)" variant="outline">
                 <SquarePen/>
               </Button>
               <Button @click="openDeleteDialog(item)" variant="destructive">
                 <Trash2 />
               </Button>
+            </TableCell>
+          </TableRow>
+        </TableBody>
+        <TableBody v-else class="">
+          <TableRow>
+            <TableCell>
+              查無資料...
             </TableCell>
           </TableRow>
         </TableBody>

@@ -1,6 +1,5 @@
 <script setup>
 import axios from 'axios';
-import { useCookies } from '@vueuse/integrations/useCookies'
 import dashboardSearchbar from './dashboardSearchbar.vue';
 import DashboardUpdateDialog from './dashboardUpdateDialog.vue';
 import DashboardMessageDialog from './dashboardMessageDialog.vue';
@@ -49,35 +48,25 @@ const pageFillterdData = ref([])
 const loading = ref(false)
 
 const baseApiUrl=import.meta.env.VITE_APP_API_URL//+"admin/"
-const cookies = useCookies(['fishingMap'])
-const token = cookies.getAll().fishingMap
-
-const speciesAPI = axios.create({
-  headers: {
-    "Content-Type": "application/json; charset=utf-8",
-    Accept: "application/json",
-    Authorization:`${token}`
-  },
-});
 
 const fetchData = async(type) => {
-  let apiUrl =baseApiUrl+type
-  loading.value = true
-  try {
-    const { data } = await speciesAPI.get(apiUrl)
+    let apiUrl =baseApiUrl+type
+    loading.value = true
+    try {
+        const { data } = await axios.get(apiUrl)
         
-    pageData.value = data.result
-    pageFillterdData.value = data.result
-    loading.value = false
-  } catch (error) {
-    console.log(error)
-    if(error.status === 403) {
-      router.push({name: 'NoAccess'})
-    }else{
-      toast.warning('資料取得失敗')
-      loading.value = false
+        pageData.value = data.result
+        pageFillterdData.value = data.result
+        loading.value = false
+    } catch (error) {
+        console.log(error)
+        if(error.status === 403) {
+            router.push({name: 'NoAccess'})
+        }else{
+            toast.warning('資料取得失敗')
+            loading.value = false
+        }
     }
-  }
 }
 
 const fillerData = (search={query:"",city:""}) => {
@@ -127,19 +116,19 @@ const fillerData = (search={query:"",city:""}) => {
     let apiUrl =baseApiUrl+dataType.value+item._id
     loading.value = true
     try {
-      const { data } = await axios.delete(apiUrl)
-      if(data.result)
-      loading.value = false
-      toast.success('項目刪除成功')
-      fetchData(dataType.value)
-    } catch (error) {
-      console.log(error)
-      if(error.status === 403) {
-        router.push({name: 'NoAccess'})
-      }else{
-        toast.warning('項目刪除失敗')
+        const { data } = await axios.delete(apiUrl)
+        if(data.result)
         loading.value = false
-      }
+        toast.success('項目刪除成功')
+        fetchData(dataType.value)
+    } catch (error) {
+        console.log(error)
+        if(error.status === 403) {
+            router.push({name: 'NoAccess'})
+        }else{
+            toast.warning('項目刪除失敗')
+            loading.value = false
+        }
     }
   }
 </script>

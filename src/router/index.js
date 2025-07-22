@@ -12,6 +12,10 @@ import ErrorPage from '@/pages/ErrorPage.vue'
 import AdminLayout from '@/components/layout/AdminLayout.vue'
 import DashboardPage from '@/pages/dashboard/dashboardPage.vue'
 import DashboardSpecies from '@/pages/dashboard/dashboardSpecies.vue'
+import DashboardFishingSpot from '@/pages/dashboard/dashboardFishingSpot.vue'
+import DashboardFishingTackleShop from '@/pages/dashboard/dashboardFishingTackleShop.vue'
+import DashboardReport from '@/pages/dashboard/dashboardReport.vue'
+import DashboardUser from '@/pages/dashboard/dashboardUser.vue'
 import NoAccessPage from '@/pages/NoAccessPage.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -114,12 +118,44 @@ const router = createRouter({
           component: DashboardPage,
         },
         {
-          path: '/admin/dashboard/species',
-          name: 'dashboard',
+          path: '/admin/dashboard/fishingSpot',
+          name: 'dashboard-fishingSpot',
           meta:{
-            title:"物種",
+            title:"釣點管理",
+          },
+          component: DashboardFishingSpot,
+        },
+        {
+          path: '/admin/dashboard/fishingTackleShop',
+          name: 'dashboard-fishingTackleShop',
+          meta:{
+            title:"釣具店管理",
+          },
+          component: DashboardFishingTackleShop,
+        },
+        {
+          path: '/admin/dashboard/species',
+          name: 'dashboard-species',
+          meta:{
+            title:"魚種管理",
           },
           component: DashboardSpecies,
+        },
+        {
+          path: '/admin/dashboard/report',
+          name: 'dashboard-report',
+          meta:{
+            title:"回報管理",
+          },
+          component: DashboardReport,
+        },
+        {
+          path: '/admin/dashboard/user',
+          name: 'dashboard-user',
+          meta:{
+            title:"使用者管理",
+          },
+          component: DashboardUser,
         },
       ]
     }

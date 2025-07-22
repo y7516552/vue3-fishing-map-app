@@ -115,7 +115,7 @@ const  getSpecies = async () => {
     </div>
 
     <div class="text-center p-4">
-      <p>資料取自: <a class="text-blue-600" href="https://fishdb.sinica.edu.tw"> 台灣魚類資料庫 </a></p>
+      <p>資料取自: <a class="text-blue-600" target="_blank" rel="noopener noreferrer" href="https://fishdb.sinica.edu.tw"> 台灣魚類資料庫 </a></p>
     </div>
 
     <MessageDialog class="z-1000" :data="MsgData" :open="openMsg" @close="()=> {openMsg=false}"></MessageDialog>

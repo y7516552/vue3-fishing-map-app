@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils';
-// import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
@@ -125,7 +125,9 @@ const updateDialogState = (e) => {
         <DialogDescription>{{ props.data }}</DialogDescription>
         <div :class="cn('flex flex-col gap-6')">
           <form @submit.stop="onSubmit">
+
             <div v-if="dataType=='fishingTackleShop'" class="grid grid-cols-2 gap-6 ">
+
               <div class="grid gap-3">
                 <FormField v-slot="{ componentField }" name="placesId">
                   <FormItem>
@@ -255,6 +257,75 @@ const updateDialogState = (e) => {
               
            
             </div>
+
+
+            <div v-if="dataType=='species'" class="grid grid-cols-1 gap-6 ">
+              <div class="grid gap-3">
+                <FormField v-slot="{ componentField }" name="CommonName">
+                  <FormItem>
+                    <FormLabel>俗名</FormLabel>
+                    <FormControl>
+                      <Input type="text"  v-bind="componentField" required/>
+                    </FormControl>
+                    <FormDescription>
+                      請輸入物種俗名
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                </FormField>
+              </div>
+              
+              <div class="grid gap-3">
+                <FormField v-slot="{ componentField }" name="ScientificName">
+                  <FormItem>
+                    <FormLabel>學名</FormLabel>
+                    <FormControl>
+                      <Input type="text"  v-bind="componentField" required/>
+                    </FormControl>
+                    <FormDescription>
+                      請輸入物種學名
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                </FormField>
+              </div>
+              
+              <div class="grid gap-3">
+                <FormField v-slot="{ componentField }" name="imageUrl">
+                  <FormItem>
+                    <FormLabel>圖片</FormLabel>
+                    <FormControl>
+                      <Input type="text"  v-bind="componentField" required/>
+                    </FormControl>
+                    <FormDescription>
+                      請輸入圖片 Url
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                </FormField>
+              </div>
+              
+              <div class="grid gap-3">
+                <FormField v-slot="{ componentField }" name="fishDBUrl">
+                  <FormItem>
+                    <FormLabel>資料連結</FormLabel>
+                    <FormControl>
+                      <Input type="text"  v-bind="componentField" required/>
+                    </FormControl>
+                    <FormDescription>
+                      請輸入資料連結 Url
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                </FormField>
+              </div>
+            
+              <div class="">
+                <Button type="submit">送出</Button>
+                <Button @click="emit('close')">取消</Button>
+              </div>
+            </div>
+
           </form>
           <div class="loading bg-gray-800 opacity-50 absolute bottom-0 left-0 w-full h-full  justify-center items-center " :class="[isLoading ? 'flex':'hidden']">
             <LoaderCircle size="128" color="white" class="mr-3 animate-spin"/>

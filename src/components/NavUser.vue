@@ -36,7 +36,6 @@ const router = useRouter()
 
 const store = useUserStore()
 const { userData} = storeToRefs(store)
-console.log('userData',userData.value)
 
 
 const emit = defineEmits(['logout'])
@@ -98,7 +97,7 @@ const { isMobile } = useSidebar();
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup v-if="userData.role=='admin'">
-            <DropdownMenuItem @click="router.push({name:'dashboard',params:{type:'species'}})">
+            <DropdownMenuItem @click="router.push({name:'dashboard'})">
               <Sparkles />
               Dashboard
             </DropdownMenuItem>

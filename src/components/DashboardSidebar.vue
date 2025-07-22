@@ -12,6 +12,12 @@ import {
 
 import {
   FishSymbol,
+  PanelsTopLeft,
+  Gauge,
+  Waves,
+  ShoppingCart,
+  MessageCircleWarning,
+  Users,
 } from 'lucide-vue-next';
 import { useUserStore }from'../stores/user'
 import { storeToRefs } from 'pinia'
@@ -25,7 +31,7 @@ const { isLogin, userData } = storeToRefs(store)
 check()
 
 watch(isLogin,()=>{
-
+  if(!isLogin.value) console.log('未登入...')
 })
 
 const emit = defineEmits(['openLoginDialog'])
@@ -57,43 +63,43 @@ const data = {
       title: '前台首頁',
       url: '/',
       route:'home',
-      icon: FishSymbol,
+      icon: PanelsTopLeft,
     },
     {
       title: '後台首頁',
       url: '/admin/dashboard',
       route:'dashboard',
-      icon: FishSymbol,
+      icon: Gauge,
     },
     {
       title: '釣點管理',
       url: '/admin/dashboard/fishingSpot',
-      route:'dashboard',
-      icon: FishSymbol,
+      route:'dashboard-fishingSpot',
+      icon: Waves,
     },
     {
       title: '釣具店管理',
       url: '/admin/dashboard/fishingTackleShop',
-      route:'dashboard',
-      icon: FishSymbol,
+      route:'dashboard-fishingTackleShop',
+      icon: ShoppingCart,
     },
     {
       title: '魚種管理',
       url: '/admin/dashboard/species',
-      route:'dashboard',
+      route:'dashboard-species',
       icon: FishSymbol,
     },
     {
       title: '回報管理',
       url: '/admin/dashboard/report',
-      route:'dashboard',
-      icon: FishSymbol,
+      route:'dashboard-report',
+      icon: MessageCircleWarning,
     },
     {
       title: '使用者管理',
       url: '/admin/dashboard/user',
-      route:'dashboard',
-      icon: FishSymbol,
+      route:'dashboard-user',
+      icon: Users,
     },
   ],
 };

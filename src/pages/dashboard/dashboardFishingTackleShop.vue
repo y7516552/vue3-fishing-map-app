@@ -181,26 +181,10 @@ const fillerData = (search={query:"",city:""}) => {
         <TableHeader>
           <TableRow>
             <TableHead v-for="item in tableHead" :key="item" >{{ item }}</TableHead>
-            <!-- <TableHead class="w-[100px]">
-              Invoice
-            </TableHead>
-            <TableHead>Method</TableHead>
-            <TableHead class="text-right">
-              Amount
-            </TableHead> -->
           </TableRow>
         </TableHeader>
         <TableBody>
-          <!-- <TableRow>
-            <TableCell class="font-medium">
-              INV001
-            </TableCell>
-            <TableCell>Paid</TableCell>
-            <TableCell>Credit Card</TableCell>
-            <TableCell class="text-right">
-              $250.00
-            </TableCell>
-          </TableRow> -->
+          
           <TableRow v-for="item in pageFillterdData" :key="item._id">
             <TableCell class="font-medium">
               {{ item.name }}

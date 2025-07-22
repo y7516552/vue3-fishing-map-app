@@ -33,7 +33,7 @@ const tableHead =[
   "action"
 ]
 
-const dataType = ref('report')
+const dataType = ref('fishingSpot')
 
 const dataForm = {
   fishingTackleShop:{
@@ -211,7 +211,7 @@ const fillerData = (search={query:"",city:""}) => {
               {{ item.status }}
             </TableCell>
             <TableCell class="text-center">
-              <Button @click="openUpdateDialog('edit',item)" variant="outline">
+              <Button class="mx-2" @click="openUpdateDialog('edit',item)" variant="outline">
                 <SquarePen/>
               </Button>
               <Button @click="openDeleteDialog(item)" variant="destructive">

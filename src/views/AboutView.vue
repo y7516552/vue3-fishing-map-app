@@ -17,7 +17,7 @@ import { Github, Mail } from 'lucide-vue-next';
     </div>
 
     <div class="mb-6 flex flex-col justify-center items-center gap-4">
-      <p>參考資料:   <a href="https://fishdb.sinica.edu.tw/">臺灣魚類資料庫</a></p>
+      <p>參考資料:   <a  target="_blank" rel="noopener noreferrer" href="https://fishdb.sinica.edu.tw/">臺灣魚類資料庫</a></p>
     </div>
 
     <div class="mb-6 flex flex-col justify-center items-center gap-4">
