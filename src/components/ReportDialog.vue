@@ -1,5 +1,4 @@
 <script setup >
-import {Info} from 'lucide-vue-next';
 import { toTypedSchema } from '@vee-validate/zod'
 import { ref, watch } from 'vue'
 import * as z from 'zod'
@@ -12,7 +11,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog'
 import {
   Form,
@@ -91,12 +89,6 @@ function onSubmit(values) {
 <template>
   <Form  v-slot="{ handleSubmit }" as="" keep-values :validation-schema="formSchema">
     <Dialog v-model:open="isOpen" @update:open="updateState">
-      <DialogTrigger as-child>
-        <Button variant="outline">
-          <Info/>
-          回報問題
-        </Button>
-      </DialogTrigger>
       <DialogContent class="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>回報問題</DialogTitle>

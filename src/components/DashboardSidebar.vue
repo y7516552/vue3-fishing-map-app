@@ -18,6 +18,7 @@ import { storeToRefs } from 'pinia'
 import {   watch } from 'vue';
 
 
+
 const store = useUserStore()
 const { check ,logout} = store
 const { isLogin, userData } = storeToRefs(store)
@@ -55,36 +56,43 @@ const data = {
     {
       title: '前台首頁',
       url: '/',
+      route:'home',
       icon: FishSymbol,
     },
     {
       title: '後台首頁',
       url: '/admin/dashboard',
+      route:'dashboard',
       icon: FishSymbol,
     },
     {
       title: '釣點管理',
       url: '/admin/dashboard/fishingSpot',
+      route:'dashboard',
       icon: FishSymbol,
     },
     {
       title: '釣具店管理',
       url: '/admin/dashboard/fishingTackleShop',
+      route:'dashboard',
       icon: FishSymbol,
     },
     {
       title: '魚種管理',
       url: '/admin/dashboard/species',
+      route:'dashboard',
       icon: FishSymbol,
     },
     {
       title: '回報管理',
       url: '/admin/dashboard/report',
+      route:'dashboard',
       icon: FishSymbol,
     },
     {
       title: '使用者管理',
       url: '/admin/dashboard/user',
+      route:'dashboard',
       icon: FishSymbol,
     },
   ],

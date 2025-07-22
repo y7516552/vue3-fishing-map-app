@@ -32,22 +32,20 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-import { useRoute } from 'vue-router'
 
-const route = useRoute()
 
-const dataType = route.params.type
 
-const props = defineProps(['openUpdateDialog','data'])
+
+const props = defineProps(['openUpdateDialog','dataType','data'])
 const emit = defineEmits(['close','updateItem'])
 
-const title = ref(`新增 ${dataType}`)
+const title = ref(`新增 ${props.dataType}`)
 
 const isOpen =ref(false)
 watch(props,() =>{
   isOpen.value = false
   if(props.openUpdateDialog)isOpen.value = true
-  if(props.data._id) title.value =`修改 ${dataType}`
+  if(props.data._id) title.value =`修改 ${props.dataType}`
 })
 
 
@@ -93,7 +91,7 @@ const dataForm = {
 }
 
 
-const formSchema = toTypedSchema(z.object(dataForm[dataType]))
+const formSchema = toTypedSchema(z.object(dataForm[props.dataType]))
 
 const form = useForm({
   validationSchema: formSchema,
@@ -107,6 +105,13 @@ const onSubmit = form.handleSubmit( (values) => {
   isLoading.value = true
   emit('updateItem',values)
 })
+
+const updateDialogState = (e) => {
+    if(!e) {
+      isOpen.value = e
+      emit('close')
+    }
+}
 
 
 

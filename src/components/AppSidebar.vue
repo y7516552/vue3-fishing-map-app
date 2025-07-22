@@ -65,11 +65,13 @@ const data = {
     {
       title: '首頁',
       url: '/',
+      route:'home',
       icon: FishSymbol,
     },
     {
       title: '地圖',
       url: '/map',
+      route:'map',
       icon: Map,
     },
     {
@@ -80,24 +82,29 @@ const data = {
         {
           title: '資訊一覽',
           url: '/info',
+          route:'info-page',
         },
         {
           title: '釣點',
           url: '/info/fishingSpot',
+          route:'fishingSpot',
         },
         {
           title: '釣具店',
           url: '/info/fishingTackleShop',
+          route:'fishingTackleShop',
         },
         {
           title: '魚種',
           url: '/info/species',
+          route:'species',
         },
       ],
     },
     {
       title: '關於網站',
       url: '/about',
+      route:'about',
       icon: BookOpen,
     },
     // {

@@ -8,7 +8,6 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-  CardAction,
 } from '@/components/ui/card'
 import { AspectRatio } from '@/components/ui/aspect-ratio'
 import { ref, onMounted } from 'vue'
@@ -78,21 +77,19 @@ const  getSpecies = async () => {
 
 <template>
   <div>
-    <div>
-      <Button @click="openReportDialog">搜尋</Button>
-    </div>
     <div class="p-4">
-      <p>資料取自: <a class="text-blue-600" href="https://fishdb.sinica.edu.tw"> 台灣魚類資料庫 </a></p>
+      <Button variant="outline" @click="openReportDialog">
+        <Info/>
+        問題回報
+      </Button>
     </div>
+    
     <div class="flex flex-1 flex-col gap-4 p-4">
       <div class="grid auto-rows-min gap-4 md:grid-cols-3">
         <Card v-for="item in species" :key="item._id" class="aspect-video rounded-xl bg-muted/50 pt-4 pb-4">
           <CardHeader>
             <CardTitle class="mb-3">{{item.CommonName}}</CardTitle>
             <CardDescription>學名:  {{item.ScientificName}}</CardDescription>
-            <CardAction @click="openReportDialog">
-              <Info/>
-            </CardAction>
           </CardHeader>
           <CardContent>
             <div class="w-full">
@@ -116,6 +113,11 @@ const  getSpecies = async () => {
       </div>
       <div class="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" ></div>
     </div>
+
+    <div class="text-center p-4">
+      <p>資料取自: <a class="text-blue-600" href="https://fishdb.sinica.edu.tw"> 台灣魚類資料庫 </a></p>
+    </div>
+
     <MessageDialog class="z-1000" :data="MsgData" :open="openMsg" @close="()=> {openMsg=false}"></MessageDialog>
     <ReportDialog class="z-1000"  :open="openReport" @close="()=> {openReport=false}" @sendReport="sendReport"></ReportDialog>
   </div>

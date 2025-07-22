@@ -28,6 +28,15 @@ import {
   LogOut,
   Sparkles,
 } from 'lucide-vue-next';
+import {  useRouter } from 'vue-router'
+import { useUserStore }from'@/stores/user'
+import { storeToRefs } from 'pinia'
+
+const router = useRouter()
+
+const store = useUserStore()
+const { userData} = storeToRefs(store)
+console.log('userData',userData.value)
 
 
 const emit = defineEmits(['logout'])
@@ -88,6 +97,12 @@ const { isMobile } = useSidebar();
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
+          <DropdownMenuGroup v-if="userData.role=='admin'">
+            <DropdownMenuItem @click="router.push({name:'dashboard',params:{type:'species'}})">
+              <Sparkles />
+              Dashboard
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
           <DropdownMenuGroup>
             <DropdownMenuItem>
               <Sparkles />

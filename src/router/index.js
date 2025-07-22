@@ -11,6 +11,7 @@ import Species from '@/pages/info/SpeciesPage.vue'
 import ErrorPage from '@/pages/ErrorPage.vue'
 import AdminLayout from '@/components/layout/AdminLayout.vue'
 import DashboardPage from '@/pages/dashboard/dashboardPage.vue'
+import DashboardSpecies from '@/pages/dashboard/dashboardSpecies.vue'
 import NoAccessPage from '@/pages/NoAccessPage.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -105,12 +106,20 @@ const router = createRouter({
       },
       children:[
         {
-          path: '/admin/dashboard/:type',
+          path: '/admin/dashboard/',
           name: 'dashboard',
           meta:{
             title:"首頁",
           },
           component: DashboardPage,
+        },
+        {
+          path: '/admin/dashboard/species',
+          name: 'dashboard',
+          meta:{
+            title:"物種",
+          },
+          component: DashboardSpecies,
         },
       ]
     }
