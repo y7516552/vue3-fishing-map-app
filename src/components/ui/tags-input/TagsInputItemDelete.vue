@@ -1,25 +1,27 @@
 <script setup>
 import { reactiveOmit } from "@vueuse/core";
-import { Primitive } from "reka-ui";
+import { X } from "lucide-vue-next";
+import { TagsInputItemDelete, useForwardProps } from "reka-ui";
 import { cn } from "@/lib/utils";
-import { badgeVariants } from ".";
 
 const props = defineProps({
   asChild: { type: Boolean, required: false },
   as: { type: [String, Object, Function], required: false },
-  variant: { type: null, required: false },
   class: { type: null, required: false },
 });
 
 const delegatedProps = reactiveOmit(props, "class");
+
+const forwardedProps = useForwardProps(delegatedProps);
 </script>
 
 <template>
-  <Primitive
-    data-slot="badge"
-    :class="cn(badgeVariants({ variant }), props.class)"
-    v-bind="delegatedProps"
+  <TagsInputItemDelete
+    v-bind="forwardedProps"
+    :class="cn('flex rounded bg-transparent mr-1', props.class)"
   >
-    <slot />
-  </Primitive>
+    <slot>
+      <X class="w-4 h-4" />
+    </slot>
+  </TagsInputItemDelete>
 </template>

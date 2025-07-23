@@ -19,6 +19,8 @@ import { ref, onMounted } from 'vue';
 import {  useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
 import { AspectRatio } from '@/components/ui/aspect-ratio'
+import { Badge } from '@/components/ui/badge'
+
 
 const router = useRouter()
 
@@ -31,6 +33,7 @@ const tableHead =[
   "Common Name",
   "Scientific Name",
   "Image",
+  "tags",
   "Link",
   "Action"
 ]
@@ -42,13 +45,14 @@ const dataForm = {
   ScientificName:"",
   imageUrl:"",
   fishDBUrl:"",
+  tags:[]
 }
 
 const pageData = ref([])
 const pageFillterdData = ref([])
 const loading = ref(false)
 
-const baseApiUrl=import.meta.env.VITE_APP_API_URL//+"admin/"
+const baseApiUrl=import.meta.env.VITE_APP_API_URL+"admin/"
 const cookies = useCookies(['fishingMap'])
 const token = cookies.getAll().fishingMap
 
@@ -113,21 +117,45 @@ const fillerData = (search={query:"",city:""}) => {
 
   const openMsg = ref(false)
   const MsgData = ref({
+    dataType:'',
     item:{name:''},
     status:'success'
   })
 
+  const updateItem = async(item)=> {
+    console.log('updateItem',item)
+    let apiUrl =baseApiUrl+dataType.value
+    loading.value = true
+    try {
+      const { data } = await speciesAPI.post(apiUrl,item)
+      
+      console.log('data',data)
+      openUpdate.value = false
+      fetchData(dataType.value)
+      loading.value = false
+    } catch (error) {
+      console.log(error)
+      if(error.status === 403) {
+        // router.push({name: 'NoAccess'})
+        console.log('403')
+      }else{
+        toast.warning('資料取得失敗')
+        loading.value = false
+      }
+    }
+  }
+
   const openDeleteDialog = (item)=> {
-    console.log('open',item)
     openMsg.value = true
+    MsgData.value.dataType = dataType.value
     MsgData.value.item = item
   }
 
-  const deleteItem = async(item)=> {
-    let apiUrl =baseApiUrl+dataType.value+item._id
+  const deleteItem = async(id)=> {
+    let apiUrl =baseApiUrl+dataType.value+'/'+id
     loading.value = true
     try {
-      const { data } = await axios.delete(apiUrl)
+      const { data } = await speciesAPI.delete(apiUrl)
       if(data.result)
       loading.value = false
       toast.success('項目刪除成功')
@@ -135,7 +163,8 @@ const fillerData = (search={query:"",city:""}) => {
     } catch (error) {
       console.log(error)
       if(error.status === 403) {
-        router.push({name: 'NoAccess'})
+        // router.push({name: 'NoAccess'})
+        console.log('403')
       }else{
         toast.warning('項目刪除失敗')
         loading.value = false
@@ -159,23 +188,26 @@ const fillerData = (search={query:"",city:""}) => {
         <TableCaption>A list of {{ dataType }}.</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead v-for="item in tableHead" :key="item" >{{ item }}</TableHead>
+            <TableHead v-for="item in tableHead" :key="item"  class="text-center">{{ item }}</TableHead>
             
           </TableRow>
         </TableHeader>
         <TableBody v-if="pageFillterdData.length!==0">
           
           <TableRow v-for="item in pageFillterdData" :key="item._id">
-            <TableCell class="font-medium">
+            <TableCell class="font-medium text-center">
               {{ item.CommonName }}
             </TableCell>
-            <TableCell>{{ item.ScientificName }}</TableCell>
-            <TableCell  class="text-center">
+            <TableCell class="text-center">{{ item.ScientificName }}</TableCell>
+            <TableCell  class="flex justify-center">
               <div class="w-[200px]">
                 <AspectRatio :ratio="16 / 9">
                   <img :src="item.imageUrl" :alt="item.ScientificName" class="rounded-md object-cover w-full h-full">
                 </AspectRatio>
               </div>
+            </TableCell>
+            <TableCell class="text-center">
+              <Badge v-for=" tag in item.tags" :key="tag" class="bg-sky-600 mr-1">{{ tag }}</Badge>
             </TableCell>
             <TableCell  class="text-center">
               <a :href="item.fishDBUrl" target="_blank" rel="noopener noreferrer">連結</a>
@@ -199,7 +231,7 @@ const fillerData = (search={query:"",city:""}) => {
         </TableBody>
       </Table>
     </div>
-    <DashboardUpdateDialog :openUpdateDialog="openUpdate" :dataType="dataType" :data="updateData" @close="()=> {openUpdate=false}"></DashboardUpdateDialog>
-    <DashboardMessageDialog :data="MsgData" :open="openMsg" @close="()=> {openMsg=false}" @deleteItem="deleteItem"></DashboardMessageDialog>
+    <DashboardUpdateDialog :openUpdateDialog="openUpdate" :dataType="dataType" :data="updateData" @close="()=> {openUpdate=false}" @updateItem="updateItem"></DashboardUpdateDialog>
+    <DashboardMessageDialog :data="MsgData" :open="openMsg" @close="()=> {openMsg=false}"  @deleteItem="deleteItem"></DashboardMessageDialog>
   </div>
 </template>

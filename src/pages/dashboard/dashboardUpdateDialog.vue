@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
-import { ref, watch} from 'vue';
+import { ref, watch, computed} from 'vue';
 
 import {
   FormControl,
@@ -31,6 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { TagsInput, TagsInputInput, TagsInputItem, TagsInputItemDelete, TagsInputItemText } from '@/components/ui/tags-input'
 
 
 
@@ -39,14 +40,24 @@ import {
 const props = defineProps(['openUpdateDialog','dataType','data'])
 const emit = defineEmits(['close','updateItem'])
 
-const title = ref(`新增 ${props.dataType}`)
+const title = computed(()=>{
+  let updateType ='新增'
+  let typeName =''
+  if(props.data._id) updateType ='修改'
+  if(props.dataType=='fishingSpot') typeName ='釣點'
+  if(props.dataType=='fishingTackleShop') typeName ='釣具店'
+  if(props.dataType=='species') typeName ='物種'
+  if(props.dataType=='report') typeName ='報告'
+  return `${updateType} ${typeName}`
+})
 
 const isOpen =ref(false)
+
 watch(props,() =>{
   isOpen.value = false
   if(props.openUpdateDialog)isOpen.value = true
-  if(props.data._id) title.value =`修改 ${props.dataType}`
 })
+
 
 
 
@@ -81,6 +92,7 @@ const dataForm = {
     ScientificName:z.string(),
     imageUrl:z.string().url(),
     fishDBUrl:z.string().url(),
+    tags: z.array(z.string()).max(10),
   },
   report:{
     type:z.string(),
@@ -93,17 +105,25 @@ const dataForm = {
 
 const formSchema = toTypedSchema(z.object(dataForm[props.dataType]))
 
-const form = useForm({
+const  { handleSubmit ,setValues} = useForm({
   validationSchema: formSchema,
+})
+
+watch(props,() =>{
+  if(props.data._id){
+    setValues({...props.data})
+  }
 })
 
 const cityList = ["基隆市", "臺北市", "新北市", "桃園市", "新竹市", "新竹縣", "苗栗縣", "臺中市", "彰化縣", "南投縣", "雲林縣", "嘉義市", "嘉義縣", "臺南市", "高雄市", "屏東縣", "宜蘭縣", "花蓮縣", "臺東縣", "澎湖縣"]
 
 const isLoading =ref(false)
 
-const onSubmit = form.handleSubmit( (values) => {
-  isLoading.value = true
+
+const onSubmit = handleSubmit((values) => {
+  // isLoading.value = true
   emit('updateItem',values)
+  // closeDialog()
 })
 
 const updateDialogState = (e) => {
@@ -113,6 +133,10 @@ const updateDialogState = (e) => {
     }
 }
 
+const closeDialog = () => {
+  isOpen.value = false
+  emit('close')
+}
 
 
 </script>
@@ -122,9 +146,9 @@ const updateDialogState = (e) => {
     <DialogOverlay  class="z-1000">
       <DialogContent class="z-1000">
         <DialogTitle>{{ title }}</DialogTitle>
-        <DialogDescription>{{ props.data }}</DialogDescription>
+        <DialogDescription></DialogDescription>
         <div :class="cn('flex flex-col gap-6')">
-          <form @submit.stop="onSubmit">
+          <form @submit="onSubmit">
 
             <div v-if="dataType=='fishingTackleShop'" class="grid grid-cols-2 gap-6 ">
 
@@ -319,11 +343,37 @@ const updateDialogState = (e) => {
                   </FormItem>
                 </FormField>
               </div>
+
+              <div class="grid gap-3">
+                <FormField v-slot="{ componentField }" name="tags">
+                  <FormItem>
+                    <FormLabel>屬性</FormLabel>
+                    <FormControl>
+                      <TagsInput
+                        :model-value="componentField.modelValue"
+                        @update:model-value="componentField['onUpdate:modelValue']"
+                      >
+                        <TagsInputItem v-for="item in componentField.modelValue" :key="item" :value="item">
+                          <TagsInputItemText />
+                          <TagsInputItemDelete />
+                        </TagsInputItem>
             
-              <div class="">
-                <Button type="submit">送出</Button>
-                <Button @click="emit('close')">取消</Button>
+                        <TagsInputInput placeholder="屬性..." />
+                      </TagsInput>
+                    </FormControl>
+                    <FormDescription>
+                      屬性
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                </FormField>
+                  
               </div>
+            
+            </div>
+            <div class="flex justify-between">
+              <Button  type="submit">送出</Button>
+              <Button type="button"  variant="outline" @click="closeDialog">取消</Button>
             </div>
 
           </form>
