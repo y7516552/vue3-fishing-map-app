@@ -123,23 +123,26 @@ const fillerData = (search={query:"",city:""}) => {
   })
 
   const updateItem = async(item)=> {
-    console.log('updateItem',item)
-    let apiUrl =baseApiUrl+dataType.value
+    let apiUrl = baseApiUrl+dataType.value
     loading.value = true
     try {
-      const { data } = await speciesAPI.post(apiUrl,item)
+      if(item._id) {
+        await speciesAPI.put(apiUrl+`/${item._id}`,item)
+      }else{
+        await speciesAPI.post(apiUrl,item)
+      }
       
-      console.log('data',data)
       openUpdate.value = false
       fetchData(dataType.value)
       loading.value = false
+      toast.success('資料更新成功')
     } catch (error) {
       console.log(error)
       if(error.status === 403) {
         // router.push({name: 'NoAccess'})
         console.log('403')
       }else{
-        toast.warning('資料取得失敗')
+        toast.warning('資料更新失敗')
         loading.value = false
       }
     }

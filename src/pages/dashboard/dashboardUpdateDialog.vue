@@ -55,7 +55,10 @@ const isOpen =ref(false)
 
 watch(props,() =>{
   isOpen.value = false
-  if(props.openUpdateDialog)isOpen.value = true
+  if(props.openUpdateDialog){
+    isOpen.value = true
+    isLoading.value = false
+  }
 })
 
 
@@ -88,6 +91,7 @@ const dataForm = {
     city:z.string()
   },
   species:{
+    _id:z.optional(z.string()),
     CommonName:z.string(),
     ScientificName:z.string(),
     imageUrl:z.string().url(),
@@ -105,7 +109,7 @@ const dataForm = {
 
 const formSchema = toTypedSchema(z.object(dataForm[props.dataType]))
 
-const  { handleSubmit ,setValues} = useForm({
+const  { handleSubmit ,setValues,resetForm} = useForm({
   validationSchema: formSchema,
 })
 
@@ -121,21 +125,50 @@ const isLoading =ref(false)
 
 
 const onSubmit = handleSubmit((values) => {
-  // isLoading.value = true
+  isLoading.value = true
   emit('updateItem',values)
-  // closeDialog()
+   resetForm({
+    values: {
+      _id:'',
+      CommonName:'',
+      ScientificName:'',
+      imageUrl:'',
+      fishDBUrl:'',
+      tags: [],
+    },
+  });
 })
 
 const updateDialogState = (e) => {
     if(!e) {
       isOpen.value = e
       emit('close')
+      resetForm({
+    values: {
+      _id:'',
+      CommonName:'',
+      ScientificName:'',
+      imageUrl:'',
+      fishDBUrl:'',
+      tags: [],
+    },
+  });
     }
 }
 
 const closeDialog = () => {
   isOpen.value = false
   emit('close')
+  resetForm({
+    values: {
+      _id:'',
+      CommonName:'',
+      ScientificName:'',
+      imageUrl:'',
+      fishDBUrl:'',
+      tags: [],
+    },
+  });
 }
 
 
