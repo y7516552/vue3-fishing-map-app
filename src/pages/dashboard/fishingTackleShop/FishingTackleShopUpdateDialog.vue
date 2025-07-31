@@ -32,8 +32,6 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-import { TagsInput, TagsInputInput, TagsInputItem, TagsInputItemDelete, TagsInputItemText } from '@/components/ui/tags-input'
-
 
 
 
@@ -45,10 +43,7 @@ const title = computed(()=>{
   let updateType ='新增'
   let typeName =''
   if(props.data._id) updateType ='修改'
-  if(props.dataType=='fishingSpot') typeName ='釣點'
-  if(props.dataType=='fishingTackleShop') typeName ='釣具店'
-  if(props.dataType=='species') typeName ='物種'
-  if(props.dataType=='report') typeName ='報告'
+  typeName ='釣具店'
   return `${updateType} ${typeName}`
 })
 
@@ -65,50 +60,21 @@ watch(props,() =>{
 
 
 
-const dataForm = {
-  fishingTackleShop:z.object({
-    placesId:z.string(),
-    address:z.string(),
-    googleMapsUri:z.string().url(),
-    name:z.string(),
-    phone:z.string(),
-    locations:z.object({
-      type: "Point",
-      coordinates: z.array(z.number()).length(2),
-    }),
-    city:z.string()
+const dataForm = z.object({
+  placesId:z.string(),
+  address:z.string(),
+  googleMapsUri:z.string().url(),
+  name:z.string(),
+  phone:z.string(),
+  locations:z.object({
+    type: z.optional(z.literal("Point")),
+    coordinates: z.array(z.number()).length(2),
   }),
-  fishingSpot:z.object({
-    name:z.string(),
-    description:z.string(),
-    imageUrl:z.string().url(),
-    imageUrlList:z.array(z.string().url()),
-    type:z.string(),
-    fishingAllowed: z.boolean(),
-    locations:z.object({
-      type:z.string(),
-      coordinates:  z.array(z.bigint()).length(2),
-    }),
-    city:z.string()
-  }),
-  species:z.object({
-    _id:z.optional(z.string()),
-    CommonName:z.string(),
-    ScientificName:z.string(),
-    imageUrl:z.string().url(),
-    fishDBUrl:z.string().url(),
-    tags: z.array(z.string()).max(10),
-  }),
-  report:z.object({
-    type:z.string(),
-    title:z.string(),
-    description:z.string(),
-    imageUrlList:z.array(z.string().url()),
-  })
-}
+  city:z.string()
+})
 
 
-const formSchema = toTypedSchema(z.object(dataForm[props.dataType]))
+const formSchema = toTypedSchema(dataForm)
 
 const  { handleSubmit ,setValues,resetForm} = useForm({
   validationSchema: formSchema,
@@ -311,95 +277,6 @@ const closeDialog = () => {
            
             </div>
 
-
-            <div v-if="dataType=='species'" class="grid grid-cols-1 gap-6 ">
-              <div class="grid gap-3">
-                <FormField v-slot="{ componentField }" name="CommonName">
-                  <FormItem>
-                    <FormLabel>俗名</FormLabel>
-                    <FormControl>
-                      <Input type="text"  v-bind="componentField" required/>
-                    </FormControl>
-                    <FormDescription>
-                      請輸入物種俗名
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                </FormField>
-              </div>
-              
-              <div class="grid gap-3">
-                <FormField v-slot="{ componentField }" name="ScientificName">
-                  <FormItem>
-                    <FormLabel>學名</FormLabel>
-                    <FormControl>
-                      <Input type="text"  v-bind="componentField" required/>
-                    </FormControl>
-                    <FormDescription>
-                      請輸入物種學名
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                </FormField>
-              </div>
-              
-              <div class="grid gap-3">
-                <FormField v-slot="{ componentField }" name="imageUrl">
-                  <FormItem>
-                    <FormLabel>圖片</FormLabel>
-                    <FormControl>
-                      <Input type="text"  v-bind="componentField" required/>
-                    </FormControl>
-                    <FormDescription>
-                      請輸入圖片 Url
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                </FormField>
-              </div>
-              
-              <div class="grid gap-3">
-                <FormField v-slot="{ componentField }" name="fishDBUrl">
-                  <FormItem>
-                    <FormLabel>資料連結</FormLabel>
-                    <FormControl>
-                      <Input type="text"  v-bind="componentField" required/>
-                    </FormControl>
-                    <FormDescription>
-                      請輸入資料連結 Url
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                </FormField>
-              </div>
-
-              <div class="grid gap-3">
-                <FormField v-slot="{ componentField }" name="tags">
-                  <FormItem>
-                    <FormLabel>屬性</FormLabel>
-                    <FormControl>
-                      <TagsInput
-                        :model-value="componentField.modelValue"
-                        @update:model-value="componentField['onUpdate:modelValue']"
-                      >
-                        <TagsInputItem v-for="item in componentField.modelValue" :key="item" :value="item">
-                          <TagsInputItemText />
-                          <TagsInputItemDelete />
-                        </TagsInputItem>
-            
-                        <TagsInputInput placeholder="屬性..." />
-                      </TagsInput>
-                    </FormControl>
-                    <FormDescription>
-                      屬性
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                </FormField>
-                  
-              </div>
-            
-            </div>
             <div class="flex justify-between">
               <Button  type="submit">送出</Button>
               <Button type="button"  variant="outline" @click="closeDialog">取消</Button>

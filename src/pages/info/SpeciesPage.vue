@@ -15,7 +15,7 @@ import { toast } from 'vue-sonner'
 import {Info} from 'lucide-vue-next';
 import MessageDialog from '@/components/MessageDialog.vue'
 import ReportDialog from '@/components/ReportDialog.vue'
-import { useUserStore }from'../../stores/user'
+import { useUserStore }from'@/stores/user'
 import { storeToRefs } from 'pinia'
 
 const apiUrl = 'http://localhost:3000/api/v1/species'

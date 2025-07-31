@@ -33,20 +33,46 @@ const tableHead =[
   "action"
 ]
 
-const dataType = ref('fishingTackleShop')
+const dataType = ref('fishingSpot')
 
 const dataForm = {
-  placesId:"",
-  address:"",
-  googleMapsUri:"",
-  name:"",
-  phone:"",
-  locations:{
-    type: "Point",
-    coordinates: [null,null],
+  fishingTackleShop:{
+    placesId:"",
+    address:"",
+    googleMapsUri:"",
+    name:"",
+    phone:"",
+    locations:{
+      type: "Point",
+      coordinates: [0,0],
+    },
+    city:""
   },
-  city:""
-  
+  fishingSpot:{
+    name:"",
+    description:"",
+    imageUrl:"",
+    imageUrlList:"",
+    type:"",
+    fishingAllowed: true,
+    locations:{
+      type: "Point",
+      coordinates: [0,0],
+    },
+    city:""
+  },
+  species:{
+    CommonName:"",
+    ScientificName:"",
+    imageUrl:"",
+    fishDBUrl:"",
+  },
+  report:{
+    type:"",
+    title:"",
+    description:"",
+    imageUrlList:"",
+  }
 }
 
 const pageData = ref([])
@@ -100,14 +126,9 @@ const fillerData = (search={query:"",city:""}) => {
   const openUpdate = ref(false)
   const updateData = ref({})
   const openUpdateDialog = (type = 'create', data ) => {
-    if(type=='create')updateData.value = {...dataForm}
-    if(type=='edit') updateData.value = {...data}
+    updateData.value = dataForm[dataType.value]
+    if(type=='edit') updateData.value = data
     openUpdate.value = true
-  }
-
-  const closeUpdateDialog = () => {
-    updateData.value = {}
-    openUpdate.value=false
   }
 
 
@@ -160,10 +181,26 @@ const fillerData = (search={query:"",city:""}) => {
         <TableHeader>
           <TableRow>
             <TableHead v-for="item in tableHead" :key="item" >{{ item }}</TableHead>
+            <!-- <TableHead class="w-[100px]">
+              Invoice
+            </TableHead>
+            <TableHead>Method</TableHead>
+            <TableHead class="text-right">
+              Amount
+            </TableHead> -->
           </TableRow>
         </TableHeader>
         <TableBody>
-          
+          <!-- <TableRow>
+            <TableCell class="font-medium">
+              INV001
+            </TableCell>
+            <TableCell>Paid</TableCell>
+            <TableCell>Credit Card</TableCell>
+            <TableCell class="text-right">
+              $250.00
+            </TableCell>
+          </TableRow> -->
           <TableRow v-for="item in pageFillterdData" :key="item._id">
             <TableCell class="font-medium">
               {{ item.name }}
@@ -174,7 +211,7 @@ const fillerData = (search={query:"",city:""}) => {
               {{ item.status }}
             </TableCell>
             <TableCell class="text-center">
-              <Button @click="openUpdateDialog('edit',item)" variant="outline">
+              <Button class="mx-2" @click="openUpdateDialog('edit',item)" variant="outline">
                 <SquarePen/>
               </Button>
               <Button @click="openDeleteDialog(item)" variant="destructive">
@@ -185,7 +222,7 @@ const fillerData = (search={query:"",city:""}) => {
         </TableBody>
       </Table>
     </div>
-    <DashboardUpdateDialog :openUpdateDialog="openUpdate" :dataType="dataType" :data="updateData" @close="closeUpdateDialog"></DashboardUpdateDialog>
+    <DashboardUpdateDialog :openUpdateDialog="openUpdate" :dataType="dataType" :data="updateData" @close="()=> {openUpdate=false}"></DashboardUpdateDialog>
     <DashboardMessageDialog :data="MsgData" :open="openMsg" @close="()=> {openMsg=false}" @deleteItem="deleteItem"></DashboardMessageDialog>
   </div>
 </template>

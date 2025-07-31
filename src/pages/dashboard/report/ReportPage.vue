@@ -1,8 +1,9 @@
 <script setup>
 import axios from 'axios';
-import dashboardSearchbar from './dashboardSearchbar.vue';
-import DashboardUpdateDialog from './dashboardUpdateDialog.vue';
-import DashboardMessageDialog from './dashboardMessageDialog.vue';
+import { useCookies } from '@vueuse/integrations/useCookies'
+import dashboardSearchbar from '../dashboardSearchbar.vue';
+import ReportUpdateDialog from './ReportUpdateDialog.vue';
+import DashboardMessageDialog from '../dashboardMessageDialog.vue';
 import {
   Table,
   TableBody,
@@ -12,9 +13,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { Badge } from '@/components/ui/badge'
 import {CirclePlus, SquarePen, Trash2 } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button'
-import { ref, onMounted } from 'vue';
+import { ref, onMounted} from 'vue';
 import {  useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
 
@@ -26,40 +28,64 @@ const selectField = ref({
 });
 
 const tableHead =[
-  "name",
-  "phone",
-  "city",
+  "type",
+  "title",
+  "description",
   "status",
   "action"
 ]
 
-const dataType = ref('fishingTackleShop')
+const typeList = [
+  {
+    name:'資料勘誤',
+    value:'data',
+    color:'bg-blue-500'
+  },
+  {
+    name:'建議',
+    value:'suggestion',
+    color:'bg-lime-500'
+  },
+  {
+    name:'錯誤回報',
+    value:'error',
+    color:'bg-rose-500'
+  }
+]
+
+const typeData = (type) => {
+  return typeList.find(e=>e.value == type)
+}
+
+const dataType = ref('report')
 
 const dataForm = {
-  placesId:"",
-  address:"",
-  googleMapsUri:"",
-  name:"",
-  phone:"",
-  locations:{
-    type: "Point",
-    coordinates: [null,null],
-  },
-  city:""
-  
+  type:"",
+  title:"",
+  description:"",
+  imageUrlList:"",
 }
 
 const pageData = ref([])
 const pageFillterdData = ref([])
 const loading = ref(false)
 
-const baseApiUrl=import.meta.env.VITE_APP_API_URL//+"admin/"
+const baseApiUrl=import.meta.env.VITE_APP_API_URL+"admin/"
+const cookies = useCookies(['fishingMap'])
+const token = cookies.getAll().fishingMap
+
+const reportAPI = axios.create({
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      Accept: "application/json",
+      Authorization:`${token}`
+    },
+});
 
 const fetchData = async(type) => {
-    let apiUrl =baseApiUrl+type
     loading.value = true
     try {
-        const { data } = await axios.get(apiUrl)
+        const { data } = await reportAPI.get(baseApiUrl+type)
         
         pageData.value = data.result
         pageFillterdData.value = data.result
@@ -67,7 +93,8 @@ const fetchData = async(type) => {
     } catch (error) {
         console.log(error)
         if(error.status === 403) {
-            router.push({name: 'NoAccess'})
+          console.log('403')
+            // router.push({name: 'NoAccess'})
         }else{
             toast.warning('資料取得失敗')
             loading.value = false
@@ -100,34 +127,30 @@ const fillerData = (search={query:"",city:""}) => {
   const openUpdate = ref(false)
   const updateData = ref({})
   const openUpdateDialog = (type = 'create', data ) => {
-    if(type=='create')updateData.value = {...dataForm}
-    if(type=='edit') updateData.value = {...data}
+    updateData.value = dataForm
+    if(type=='edit') updateData.value = data
     openUpdate.value = true
-  }
-
-  const closeUpdateDialog = () => {
-    updateData.value = {}
-    openUpdate.value=false
   }
 
 
   const openMsg = ref(false)
   const MsgData = ref({
+    dataType:'',
     item:{name:''},
     status:'success'
   })
 
   const openDeleteDialog = (item)=> {
-    console.log('open',item)
+    MsgData.value.dataType = dataType.value
     openMsg.value = true
     MsgData.value.item = item
   }
 
-  const deleteItem = async(item)=> {
-    let apiUrl =baseApiUrl+dataType.value+item._id
+  const deleteItem = async(id)=> {
+    let apiUrl =baseApiUrl+dataType.value+'/'+id
     loading.value = true
     try {
-        const { data } = await axios.delete(apiUrl)
+        const { data } = await reportAPI.delete(apiUrl)
         if(data.result)
         loading.value = false
         toast.success('項目刪除成功')
@@ -160,16 +183,17 @@ const fillerData = (search={query:"",city:""}) => {
         <TableHeader>
           <TableRow>
             <TableHead v-for="item in tableHead" :key="item" >{{ item }}</TableHead>
+           
           </TableRow>
         </TableHeader>
-        <TableBody>
+        <TableBody v-if="pageFillterdData.length!==0">
           
           <TableRow v-for="item in pageFillterdData" :key="item._id">
             <TableCell class="font-medium">
-              {{ item.name }}
+              <Badge :class="typeData(item.type).color">{{ typeData(item.type).name }}</Badge>
             </TableCell>
-            <TableCell>{{ item.phone }}</TableCell>
-            <TableCell>{{ item.city }}</TableCell>
+            <TableCell>{{ item.title }}</TableCell>
+            <TableCell>{{ item.description }}</TableCell>
             <TableCell  class="text-center">
               {{ item.status }}
             </TableCell>
@@ -183,9 +207,16 @@ const fillerData = (search={query:"",city:""}) => {
             </TableCell>
           </TableRow>
         </TableBody>
+        <TableBody v-else class="">
+          <TableRow>
+            <TableCell>
+              查無資料...
+            </TableCell>
+          </TableRow>
+        </TableBody>
       </Table>
     </div>
-    <DashboardUpdateDialog :openUpdateDialog="openUpdate" :dataType="dataType" :data="updateData" @close="closeUpdateDialog"></DashboardUpdateDialog>
+    <ReportUpdateDialog :openUpdateDialog="openUpdate" :dataType="dataType" :data="updateData" @close="()=> {openUpdate=false}"></ReportUpdateDialog>
     <DashboardMessageDialog :data="MsgData" :open="openMsg" @close="()=> {openMsg=false}" @deleteItem="deleteItem"></DashboardMessageDialog>
   </div>
 </template>

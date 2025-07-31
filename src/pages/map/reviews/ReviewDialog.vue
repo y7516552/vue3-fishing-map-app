@@ -1,6 +1,6 @@
 <script setup >
 import { toTypedSchema } from '@vee-validate/zod'
-import { ref, watch } from 'vue'
+import { ref, watch } from 'vue' 
 import * as z from 'zod'
 
 import { Button } from '@/components/ui/button'
@@ -30,11 +30,13 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
+import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
+import { toast } from 'vue-sonner'
 import { storage } from '@/firebase/index';
 import { ref as storageRef, uploadBytesResumable, getDownloadURL,deleteObject } from 'firebase/storage';
 import { AspectRatio } from '@/components/ui/aspect-ratio'
-import { Progress } from '@/components/ui/progress'
+
 
 const props = defineProps(['open'])
 const emit = defineEmits(['close','sendReport'])
@@ -43,18 +45,11 @@ const isOpen = ref(false)
 
 const selectedFile = ref()
 const downloadURL = ref();
-const uploadProgress = ref(null);
-
-const formSchema = toTypedSchema(z.object({
-  type:z.string(),
-  title:z.string(),
-  description:z.string(),
-  imageUrlList: z.optional(z.array(z.string())),
-}))
-
 
 const handleFileUpload = async(e) => {
+  console.log("selected file",e.target.files[0])
   selectedFile.value = e.target.files[0];
+  //Upload to server
 }
 
 const upload = () => {
@@ -62,7 +57,7 @@ const upload = () => {
     return;
   }
   
-  const storageName = storageRef(storage, `images/report/${selectedFile.value.name}`);
+  const storageName = storageRef(storage, `images/${selectedFile.value.name}`);
 
   const uploadTask = uploadBytesResumable(storageName, selectedFile.value);
 
@@ -70,14 +65,18 @@ const upload = () => {
     'state_changed',
     snapshot => {
       const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-      uploadProgress.value = parseInt(progress); // 將進度以整數寫入
+      console.log('Upload is ' + progress + '% done');
+      console.log('Upload state ', snapshot.state);
+      // uploadProgress.value = parseInt(progress); // 將進度以整數寫入
     },
     error => {
       console.log('Upload error', error);
     },
     async () => {
       downloadURL.value = await getDownloadURL(uploadTask.snapshot.ref); //取得圖片url
-      uploadProgress.value = null; // 進度條清空
+      console.log('File available at', downloadURL.value);
+      // uploadProgress.value = null; // 進度條清空
+      // fileInput.value.value = ''; // 清空input
       selectedFile.value = ''; // 清空input
     }
   );
@@ -86,8 +85,6 @@ const upload = () => {
 const removeImg = async fullPath => {
   try {
     await deleteObject(storageRef(storage, fullPath));
-    selectedFile.value = ''
-    downloadURL.value=''
   } catch (error) {
     console.error('Error deleting image', error);
   }
@@ -115,19 +112,27 @@ watch(props,() =>{
 const updateState = (e) => {
     if(!e) {
         isOpen.value = e
-        selectedFile.value = ''
-        downloadURL.value=''
         emit('close')
     }
 }
 
-
+const formSchema = toTypedSchema(z.object({
+  _id:z.optional(z.string()),
+  fishingSpotId:z.string(),
+  title:z.string(),
+  description:z.string(),
+  imageUrl:z.string(),
+  imageUrlList:z.string(),
+  catchs:z.string(),
+  rating:z.string(),
+  bait:z.string()
+}))
 
 function onSubmit(values) {
     isOpen.value = false
-    if(downloadURL.value) values.imageUrlList = [downloadURL.value]
-
-    
+    toast.success('回報成功', {
+        description: '謝謝您的回饋',
+    })
     emit('sendReport',values)
 }
 </script>
@@ -205,35 +210,34 @@ function onSubmit(values) {
           
 
           <div class="mb-3">
-            
-            <FormField v-slot="{ componentField }" name="imageList"  >
+            <Label for="picture">圖片</Label>
+            <Input id="picture" @change="handleFileUpload" type="file" accept="image/*"/>
+            <Button type="button" @click="upload">
+              上傳圖片
+            </Button>
+
+            <Button  variant="destructive"  type="button" @click="removeImg(downloadURL)">
+              刪除
+            </Button>
+
+            <div v-if="downloadURL" class="flex content-center">
+              <div class="w-[300px] h-[200px]">
+                <AspectRatio :ratio="16 / 9">
+                  <img :src="downloadURL" alt="Image" class="rounded-md object-cover w-full h-full">
+                </AspectRatio>
+              </div>
+            </div>
+
+            <p v-else >圖片顯示於此</p>
+            <!-- <FormField  >
               <FormItem>
                 <FormLabel>圖片</FormLabel>
                 <FormControl>
-                  <Input id="picture"  @change="handleFileUpload" type="file" />
-                  <Button v-if="!downloadURL" type="button" @click="upload">
-                    上傳圖片
-                  </Button>
-            
-                  <div v-if="downloadURL" class="flex gap-1 items-center mt-2">
-                    <div class="w-[300px] h-[200px]">
-                      <AspectRatio :ratio="16 / 9">
-                        <img :src="downloadURL" alt="Image" class="rounded-md object-cover w-full h-full">
-                      </AspectRatio>
-                    </div>
-                    <Button  variant="destructive"  type="button" @click="removeImg(downloadURL)">
-                      刪除
-                    </Button>
-                  </div>
-                  <p v-else >圖片顯示於此</p>
-                  <div v-if="uploadProgress !== null">
-                    <Progress :model-value="uploadProgress" />
-                  </div>
-                  <Input class="hidden" type="text"  v-bind="componentField" />
+                  <Input @change="handleFileUpload" type="file"  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
-            </FormField>
+            </FormField> -->
               
           </div>
             

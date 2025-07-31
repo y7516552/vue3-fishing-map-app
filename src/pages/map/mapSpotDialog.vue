@@ -103,6 +103,7 @@ const likeSpot = async (id) => {
 }
 
 
+
 const dislikeSpot = async (id) => {
   try{
     // loading.value = true
@@ -118,7 +119,24 @@ const dislikeSpot = async (id) => {
   }
 }
 
+const reviewDailog = ref(false)
+const openReviewDailog = () => {
+  reviewDailog.value = true
+}
 
+const addReview = async(spotId)=>{
+  try{
+    // loading.value = true
+    // let apiUrl = `http://localhost:3000/api/v1/fishingSpot/${id}/dislike`
+    // const { data } = await axios.get(apiUrl)
+    // console.log('data',data)
+
+    
+  }catch(err) {
+    console.log( err)
+    loading.value = false
+  }
+}
 
 </script>
 

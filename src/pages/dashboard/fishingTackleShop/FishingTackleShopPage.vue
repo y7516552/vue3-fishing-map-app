@@ -1,8 +1,8 @@
 <script setup>
 import axios from 'axios';
-import dashboardSearchbar from './dashboardSearchbar.vue';
-import DashboardUpdateDialog from './dashboardUpdateDialog.vue';
-import DashboardMessageDialog from './dashboardMessageDialog.vue';
+import dashboardSearchbar from '../dashboardSearchbar.vue';
+import FishingTackleShopUpdateDialog from './FishingTackleShopUpdateDialog.vue';
+import DashboardMessageDialog from '../dashboardMessageDialog.vue';
 import {
   Table,
   TableBody,
@@ -185,7 +185,7 @@ const fillerData = (search={query:"",city:""}) => {
         </TableBody>
       </Table>
     </div>
-    <DashboardUpdateDialog :openUpdateDialog="openUpdate" :dataType="dataType" :data="updateData" @close="closeUpdateDialog"></DashboardUpdateDialog>
+    <FishingTackleShopUpdateDialog :openUpdateDialog="openUpdate" :dataType="dataType" :data="updateData" @close="closeUpdateDialog"></FishingTackleShopUpdateDialog>
     <DashboardMessageDialog :data="MsgData" :open="openMsg" @close="()=> {openMsg=false}" @deleteItem="deleteItem"></DashboardMessageDialog>
   </div>
 </template>

@@ -4,6 +4,7 @@ import { toast } from 'vue-sonner'
 
 const apiUrl = 'http://localhost:3000/api/v1/fishingSpot'
 
+
 export function useFishingSpot() {
     const fishingSpots = ref(null)
     const loading = ref(false)

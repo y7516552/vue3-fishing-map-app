@@ -17,36 +17,30 @@ import { Button } from '@/components/ui/button'
 import { ref, onMounted } from 'vue';
 import {  useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
+import { AspectRatio } from '@/components/ui/aspect-ratio'
 
 const router = useRouter()
 
 const selectField = ref({
     query:true,
-    city:true
+    city:false
 });
 
 const tableHead =[
-  "name",
-  "phone",
-  "city",
-  "status",
-  "action"
+  "Common Name",
+  "Scientific Name",
+  "Image",
+  "Link",
+  "Action"
 ]
 
-const dataType = ref('fishingTackleShop')
+const dataType = ref('species')
 
 const dataForm = {
-  placesId:"",
-  address:"",
-  googleMapsUri:"",
-  name:"",
-  phone:"",
-  locations:{
-    type: "Point",
-    coordinates: [null,null],
-  },
-  city:""
-  
+  CommonName:"",
+  ScientificName:"",
+  imageUrl:"",
+  fishDBUrl:"",
 }
 
 const pageData = ref([])
@@ -100,14 +94,9 @@ const fillerData = (search={query:"",city:""}) => {
   const openUpdate = ref(false)
   const updateData = ref({})
   const openUpdateDialog = (type = 'create', data ) => {
-    if(type=='create')updateData.value = {...dataForm}
-    if(type=='edit') updateData.value = {...data}
+    updateData.value = dataForm
+    if(type=='edit') updateData.value = data
     openUpdate.value = true
-  }
-
-  const closeUpdateDialog = () => {
-    updateData.value = {}
-    openUpdate.value=false
   }
 
 
@@ -160,18 +149,25 @@ const fillerData = (search={query:"",city:""}) => {
         <TableHeader>
           <TableRow>
             <TableHead v-for="item in tableHead" :key="item" >{{ item }}</TableHead>
+            
           </TableRow>
         </TableHeader>
-        <TableBody>
+        <TableBody v-if="pageFillterdData.length!==0">
           
           <TableRow v-for="item in pageFillterdData" :key="item._id">
             <TableCell class="font-medium">
-              {{ item.name }}
+              {{ item.CommonName }}
             </TableCell>
-            <TableCell>{{ item.phone }}</TableCell>
-            <TableCell>{{ item.city }}</TableCell>
+            <TableCell>{{ item.ScientificName }}</TableCell>
             <TableCell  class="text-center">
-              {{ item.status }}
+              <div class="w-[200px]">
+                <AspectRatio :ratio="16 / 9">
+                  <img :src="item.imageUrl" :alt="item.ScientificName" class="rounded-md object-cover w-full h-full">
+                </AspectRatio>
+              </div>
+            </TableCell>
+            <TableCell  class="text-center">
+              <a :href="item.fishDBUrl" target="_blank" rel="noopener noreferrer">連結</a>
             </TableCell>
             <TableCell class="text-center">
               <Button @click="openUpdateDialog('edit',item)" variant="outline">
@@ -183,9 +179,16 @@ const fillerData = (search={query:"",city:""}) => {
             </TableCell>
           </TableRow>
         </TableBody>
+        <TableBody v-else class="">
+          <TableRow>
+            <TableCell>
+              查無資料...
+            </TableCell>
+          </TableRow>
+        </TableBody>
       </Table>
     </div>
-    <DashboardUpdateDialog :openUpdateDialog="openUpdate" :dataType="dataType" :data="updateData" @close="closeUpdateDialog"></DashboardUpdateDialog>
+    <DashboardUpdateDialog :openUpdateDialog="openUpdate" :dataType="dataType" :data="updateData" @close="()=> {openUpdate=false}"></DashboardUpdateDialog>
     <DashboardMessageDialog :data="MsgData" :open="openMsg" @close="()=> {openMsg=false}" @deleteItem="deleteItem"></DashboardMessageDialog>
   </div>
 </template>
