@@ -15,7 +15,7 @@ import DashboardSpecies from '@/pages/dashboard/species/SpeciesPage.vue'
 import DashboardFishingSpot from '@/pages/dashboard/dashboardFishingSpot.vue'
 import DashboardFishingTackleShop from '@/pages/dashboard/fishingTackleShop/FishingTackleShopPage.vue'
 import DashboardReport from '@/pages/dashboard/report/ReportPage.vue'
-import DashboardUser from '@/pages/dashboard/dashboardUser.vue'
+import DashboardUser from '@/pages/dashboard/user/UserPage.vue'
 import NoAccessPage from '@/pages/NoAccessPage.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

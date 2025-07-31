@@ -1,8 +1,9 @@
 <script setup>
 import axios from 'axios';
-import dashboardSearchbar from './dashboardSearchbar.vue';
-import DashboardUpdateDialog from './dashboardUpdateDialog.vue';
-import DashboardMessageDialog from './dashboardMessageDialog.vue';
+import { useCookies } from '@vueuse/integrations/useCookies'
+import dashboardSearchbar from '../dashboardSearchbar.vue';
+import DashboardUpdateDialog from '../dashboardUpdateDialog.vue';
+import DashboardMessageDialog from '../dashboardMessageDialog.vue';
 import {
   Table,
   TableBody,
@@ -27,14 +28,14 @@ const selectField = ref({
 });
 
 const tableHead =[
-  "Common Name",
-  "Scientific Name",
-  "Image",
-  "Link",
+  "name",
+  "email",
+  "phone",
+  "avatar",
   "Action"
 ]
 
-const dataType = ref('species')
+const dataType = ref('user')
 
 const dataForm = {
   CommonName:"",
@@ -47,21 +48,30 @@ const pageData = ref([])
 const pageFillterdData = ref([])
 const loading = ref(false)
 
-const baseApiUrl=import.meta.env.VITE_APP_API_URL//+"admin/"
+const baseApiUrl=import.meta.env.VITE_APP_API_URL+"admin/"
+const cookies = useCookies(['fishingMap'])
+const token = cookies.getAll().fishingMap
+
+const userAPI = axios.create({
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      Accept: "application/json",
+      Authorization:`${token}`
+    },
+});
 
 const fetchData = async(type) => {
     let apiUrl =baseApiUrl+type
     loading.value = true
     try {
-        const { data } = await axios.get(apiUrl)
-        
+        const { data } = await userAPI.get(apiUrl)
         pageData.value = data.result
         pageFillterdData.value = data.result
         loading.value = false
     } catch (error) {
         console.log(error)
         if(error.status === 403) {
-            router.push({name: 'NoAccess'})
+            // router.push({name: 'NoAccess'})
         }else{
             toast.warning('資料取得失敗')
             loading.value = false
@@ -156,18 +166,16 @@ const fillerData = (search={query:"",city:""}) => {
           
           <TableRow v-for="item in pageFillterdData" :key="item._id">
             <TableCell class="font-medium">
-              {{ item.CommonName }}
+              {{ item.name }}
             </TableCell>
-            <TableCell>{{ item.ScientificName }}</TableCell>
+            <TableCell>{{ item.email }}</TableCell>
+            <TableCell>{{ item.phone }}</TableCell>
             <TableCell  class="text-center">
               <div class="w-[200px]">
                 <AspectRatio :ratio="16 / 9">
-                  <img :src="item.imageUrl" :alt="item.ScientificName" class="rounded-md object-cover w-full h-full">
+                  <img :src="item.avatarUrl" :alt="item.name" class="rounded-md object-cover w-full h-full">
                 </AspectRatio>
               </div>
-            </TableCell>
-            <TableCell  class="text-center">
-              <a :href="item.fishDBUrl" target="_blank" rel="noopener noreferrer">連結</a>
             </TableCell>
             <TableCell class="text-center">
               <Button @click="openUpdateDialog('edit',item)" variant="outline">
@@ -188,7 +196,7 @@ const fillerData = (search={query:"",city:""}) => {
         </TableBody>
       </Table>
     </div>
-    <DashboardUpdateDialog :openUpdateDialog="openUpdate" :dataType="dataType" :data="updateData" @close="()=> {openUpdate=false}"></DashboardUpdateDialog>
-    <DashboardMessageDialog :data="MsgData" :open="openMsg" @close="()=> {openMsg=false}" @deleteItem="deleteItem"></DashboardMessageDialog>
+    <!-- <DashboardUpdateDialog :openUpdateDialog="openUpdate" :dataType="dataType" :data="updateData" @close="()=> {openUpdate=false}"></DashboardUpdateDialog> -->
+    <!-- <DashboardMessageDialog :data="MsgData" :open="openMsg" @close="()=> {openMsg=false}" @deleteItem="deleteItem"></DashboardMessageDialog> -->
   </div>
 </template>

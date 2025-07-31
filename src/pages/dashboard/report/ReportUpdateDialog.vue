@@ -49,6 +49,7 @@ const uploadProgress = ref(null);
 
 
 const dataForm = {
+  _id:z.optional(z.string()),
   type:z.string(),
   title:z.string(),
   description:z.string(),
@@ -58,14 +59,17 @@ const dataForm = {
 
 const formSchema = toTypedSchema(z.object(dataForm))
 
-const  { handleSubmit ,setValues, resetForm } = useForm({
+const  { handleSubmit ,setValues } = useForm({
   validationSchema: formSchema,
 })
 
 watch(props,() =>{
   if(props.data._id){
+    isUpdate.value = false
     setValues({...props.data})
     if(props.data.imageUrlList) downloadURL.value = props.data.imageUrlList[0]
+  }else{
+    isUpdate.value = true
   }
 })
 
@@ -143,13 +147,13 @@ const updateState = (e) => {
 
 
 
-function onSubmit(values) {
+const onSubmit = handleSubmit((values) =>{
     isOpen.value = false
     if(downloadURL.value) values.imageList = [downloadURL.value]
 
     isUpdate.value = false
-    emit('sendReport',values)
-}
+    emit('updateItem',values)
+})
 </script>
 
 <template>
@@ -161,7 +165,7 @@ function onSubmit(values) {
         </DialogDescription>
       </DialogHeader>
 
-      <form id="dialogForm" @submit="handleSubmit($event, onSubmit)">
+      <form  @submit="onSubmit">
         <div class="mb-3">
           <div v-if="!isUpdate" class="">
             <p class="text-base">類型</p>
@@ -275,18 +279,16 @@ function onSubmit(values) {
           </FormField>
             
         </div>
-          
-
+        <Button v-if="isUpdate" type="submit" >
+          送出
+        </Button>
       </form>
 
       <DialogFooter>
-        <Button v-if="isUpdate" type="submit" form="dialogForm">
-          送出
-        </Button>
-        <Button v-if="isUpdate" type="button" @click="isUpdate=false">
+        <Button v-if="isUpdate&&props.data._id" type="button" @click="isUpdate=false">
           取消
         </Button>
-        <Button v-else type="button" @click="isUpdate=true">
+        <Button v-if="!isUpdate&&props.data._id" type="button" @click="isUpdate=true">
           修改
         </Button>
       </DialogFooter>

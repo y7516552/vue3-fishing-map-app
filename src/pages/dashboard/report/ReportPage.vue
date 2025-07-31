@@ -57,6 +57,23 @@ const typeData = (type) => {
   return typeList.find(e=>e.value == type)
 }
 
+const statusList = [
+  {
+    name:'未處理',
+    value:'1',
+    color:'bg-yellow-500'
+  },
+  {
+    name:'已完成',
+    value:'0',
+    color:'bg-green-500'
+  }
+]
+
+const statusData = (status) => {
+  return statusList.find(e=>e.value == status)
+}
+
 const dataType = ref('report')
 
 const dataForm = {
@@ -128,8 +145,17 @@ const fillerData = (search={query:"",city:""}) => {
   const updateData = ref({})
   const openUpdateDialog = (type = 'create', data ) => {
     updateData.value = dataForm
-    if(type=='edit') updateData.value = data
+    if(type=='edit') updateData.value = {...data}
     openUpdate.value = true
+  }
+  const closeUpdateDialog = () => {
+    openUpdate.value=false
+    updateData.value = {
+      type:"",
+      title:"",
+      description:"",
+      imageUrlList:"",
+    }
   }
 
 
@@ -145,6 +171,33 @@ const fillerData = (search={query:"",city:""}) => {
     openMsg.value = true
     MsgData.value.item = item
   }
+
+  const updateItem = async(item)=> {
+    let apiUrl = baseApiUrl+dataType.value
+    loading.value = true
+    try {
+      if(item._id) {
+        await reportAPI.put(apiUrl+`/${item._id}`,item)
+      }else{
+        await reportAPI.post(apiUrl,item)
+      }
+      
+      openUpdate.value = false
+      fetchData(dataType.value)
+      loading.value = false
+      toast.success('資料更新成功')
+    } catch (error) {
+      console.log(error)
+      if(error.status === 403) {
+        // router.push({name: 'NoAccess'})
+        console.log('403')
+      }else{
+        toast.warning('資料更新失敗')
+        loading.value = false
+      }
+    }
+  }
+  
 
   const deleteItem = async(id)=> {
     let apiUrl =baseApiUrl+dataType.value+'/'+id
@@ -195,7 +248,7 @@ const fillerData = (search={query:"",city:""}) => {
             <TableCell>{{ item.title }}</TableCell>
             <TableCell>{{ item.description }}</TableCell>
             <TableCell  class="text-center">
-              {{ item.status }}
+              <Badge :class="statusData(item.status).color">{{ statusData(item.status).name }}</Badge>
             </TableCell>
             <TableCell class="text-center">
               <Button @click="openUpdateDialog('edit',item)" variant="outline">
@@ -216,7 +269,7 @@ const fillerData = (search={query:"",city:""}) => {
         </TableBody>
       </Table>
     </div>
-    <ReportUpdateDialog :openUpdateDialog="openUpdate" :dataType="dataType" :data="updateData" @close="()=> {openUpdate=false}"></ReportUpdateDialog>
+    <ReportUpdateDialog :openUpdateDialog="openUpdate" :dataType="dataType" :data="updateData" @updateItem="updateItem" @close="closeUpdateDialog"></ReportUpdateDialog>
     <DashboardMessageDialog :data="MsgData" :open="openMsg" @close="()=> {openMsg=false}" @deleteItem="deleteItem"></DashboardMessageDialog>
   </div>
 </template>
