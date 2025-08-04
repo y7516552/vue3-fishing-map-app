@@ -2,8 +2,8 @@
 import axios from 'axios';
 import { useCookies } from '@vueuse/integrations/useCookies'
 import dashboardSearchbar from '../dashboardSearchbar.vue';
-import DashboardUpdateDialog from '../dashboardUpdateDialog.vue';
-import DashboardMessageDialog from '../dashboardMessageDialog.vue';
+import DashboardUpdateDialog from './UserUpdateDialog.vue';
+// import DashboardMessageDialog from '../dashboardMessageDialog.vue';
 import {
   Table,
   TableBody,
@@ -13,14 +13,12 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import {CirclePlus, SquarePen, Trash2 } from 'lucide-vue-next';
+import { SquarePen, /*Trash2*/ } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button'
 import { ref, onMounted } from 'vue';
-import {  useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
 import { AspectRatio } from '@/components/ui/aspect-ratio'
 
-const router = useRouter()
 
 const selectField = ref({
     query:true,
@@ -110,37 +108,37 @@ const fillerData = (search={query:"",city:""}) => {
   }
 
 
-  const openMsg = ref(false)
-  const MsgData = ref({
-    item:{name:''},
-    status:'success'
-  })
+  // const openMsg = ref(false)
+  // const MsgData = ref({
+  //   item:{name:''},
+  //   status:'success'
+  // })
 
-  const openDeleteDialog = (item)=> {
-    console.log('open',item)
-    openMsg.value = true
-    MsgData.value.item = item
-  }
+  // const openDeleteDialog = (item)=> {
+  //   console.log('open',item)
+  //   openMsg.value = true
+  //   MsgData.value.item = item
+  // }
 
-  const deleteItem = async(item)=> {
-    let apiUrl =baseApiUrl+dataType.value+item._id
-    loading.value = true
-    try {
-        const { data } = await axios.delete(apiUrl)
-        if(data.result)
-        loading.value = false
-        toast.success('項目刪除成功')
-        fetchData(dataType.value)
-    } catch (error) {
-        console.log(error)
-        if(error.status === 403) {
-            router.push({name: 'NoAccess'})
-        }else{
-            toast.warning('項目刪除失敗')
-            loading.value = false
-        }
-    }
-  }
+  // const deleteItem = async(item)=> {
+  //   let apiUrl =baseApiUrl+dataType.value+item._id
+  //   loading.value = true
+  //   try {
+  //       const { data } = await axios.delete(apiUrl)
+  //       if(data.result)
+  //       loading.value = false
+  //       toast.success('項目刪除成功')
+  //       fetchData(dataType.value)
+  //   } catch (error) {
+  //       console.log(error)
+  //       if(error.status === 403) {
+  //           router.push({name: 'NoAccess'})
+  //       }else{
+  //           toast.warning('項目刪除失敗')
+  //           loading.value = false
+  //       }
+  //   }
+  // }
 </script>
 
 
@@ -148,10 +146,6 @@ const fillerData = (search={query:"",city:""}) => {
   <div>
     <div class="flex p-4" >
       <dashboardSearchbar :selectField="selectField" @search-update="fillerData"/>
-      <Button @click="openUpdateDialog" class="ml-auto mr-0"> 
-        <CirclePlus/>
-        新增 
-      </Button>
     </div>
     <div class="p-4">
       <Table>
@@ -181,9 +175,9 @@ const fillerData = (search={query:"",city:""}) => {
               <Button @click="openUpdateDialog('edit',item)" variant="outline">
                 <SquarePen/>
               </Button>
-              <Button @click="openDeleteDialog(item)" variant="destructive">
+              <!-- <Button @click="openDeleteDialog(item)" variant="destructive">
                 <Trash2 />
-              </Button>
+              </Button> -->
             </TableCell>
           </TableRow>
         </TableBody>
@@ -196,7 +190,7 @@ const fillerData = (search={query:"",city:""}) => {
         </TableBody>
       </Table>
     </div>
-    <!-- <DashboardUpdateDialog :openUpdateDialog="openUpdate" :dataType="dataType" :data="updateData" @close="()=> {openUpdate=false}"></DashboardUpdateDialog> -->
+    <DashboardUpdateDialog :openUpdateDialog="openUpdate" :dataType="dataType" :data="updateData" @close="()=> {openUpdate=false}"></DashboardUpdateDialog>
     <!-- <DashboardMessageDialog :data="MsgData" :open="openMsg" @close="()=> {openMsg=false}" @deleteItem="deleteItem"></DashboardMessageDialog> -->
   </div>
 </template>

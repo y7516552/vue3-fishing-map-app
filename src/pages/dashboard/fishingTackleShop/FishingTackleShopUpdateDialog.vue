@@ -3,7 +3,7 @@ import { LoaderCircle} from 'lucide-vue-next'
 import {
   Dialog,
   DialogOverlay,
-  DialogContent,
+  DialogScrollContent,
   DialogDescription,
   DialogTitle,
 } from '@/components/ui/dialog'
@@ -123,13 +123,15 @@ const closeDialog = () => {
 <template>
   <Dialog v-model:open="isOpen" @update:open="updateDialogState" >
     <DialogOverlay  class="z-1000">
-      <DialogContent class="z-1000">
+      <DialogScrollContent class="z-1000 ">
         <DialogTitle>{{ title }}</DialogTitle>
-        <DialogDescription>{{ props.data }}</DialogDescription>
-        <div :class="cn('flex flex-col gap-6')">
+        <DialogDescription>
+          {{ props.data }}
+        </DialogDescription>
+        <div :class="cn('flex flex-col gap-6 ')">
           <form @submit="onSubmit">
 
-            <div v-if="dataType=='fishingTackleShop'" class="grid grid-cols-2 gap-6 ">
+            <div v-if="dataType=='fishingTackleShop'" class="grid grid-cols-1 gap-6 ">
 
               <div class="grid gap-3">
                 <FormField v-slot="{ componentField }" name="placesId">
@@ -161,21 +163,7 @@ const closeDialog = () => {
                 </FormField>
               </div>
 
-              <div class="grid gap-3">
-                <FormField v-slot="{ componentField }" name="googleMapsUri">
-                  <FormItem>
-                    <FormLabel>GoogleMapsUri</FormLabel>
-                    <FormControl>
-                      <Input type="text"  v-bind="componentField" required/>
-                    </FormControl>
-                    <FormDescription>
-                      請輸入GoogleMapsUri
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                </FormField>
-              </div>
-
+              
               <div class="grid gap-3">
                 <FormField v-slot="{ componentField }" name="googleMapsUri">
                   <FormItem>
@@ -287,7 +275,7 @@ const closeDialog = () => {
             <LoaderCircle size="128" color="white" class="mr-3 animate-spin"/>
           </div>
         </div>
-      </DialogContent>
+      </DialogScrollContent>
     </DialogOverlay>
   </Dialog>
 </template>

@@ -1,5 +1,6 @@
 <script setup>
 import axios from 'axios';
+import { useCookies } from '@vueuse/integrations/useCookies'
 import dashboardSearchbar from '../dashboardSearchbar.vue';
 import FishingTackleShopUpdateDialog from './FishingTackleShopUpdateDialog.vue';
 import DashboardMessageDialog from '../dashboardMessageDialog.vue';
@@ -53,13 +54,23 @@ const pageData = ref([])
 const pageFillterdData = ref([])
 const loading = ref(false)
 
-const baseApiUrl=import.meta.env.VITE_APP_API_URL//+"admin/"
+const baseApiUrl=import.meta.env.VITE_APP_API_URL+"admin/"
+const cookies = useCookies(['fishingMap'])
+const token = cookies.getAll().fishingMap
+
+const fishingTackleShopAPI = axios.create({
+  headers: {
+    "Content-Type": "application/json; charset=utf-8",
+    Accept: "application/json",
+    Authorization:`${token}`
+  },
+});
 
 const fetchData = async(type) => {
     let apiUrl =baseApiUrl+type
     loading.value = true
     try {
-        const { data } = await axios.get(apiUrl)
+        const { data } = await fishingTackleShopAPI.get(apiUrl)
         
         pageData.value = data.result
         pageFillterdData.value = data.result
@@ -127,7 +138,7 @@ const fillerData = (search={query:"",city:""}) => {
     let apiUrl =baseApiUrl+dataType.value+item._id
     loading.value = true
     try {
-        const { data } = await axios.delete(apiUrl)
+        const { data } = await fishingTackleShopAPI.delete(apiUrl)
         if(data.result)
         loading.value = false
         toast.success('項目刪除成功')

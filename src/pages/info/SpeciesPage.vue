@@ -84,18 +84,18 @@ const  getSpecies = async () => {
       </Button>
     </div>
     
-    <div class="flex flex-1 flex-col gap-4 p-4">
-      <div class="grid auto-rows-min gap-4 md:grid-cols-3">
+    <div class="flex flex-1 flex-col gap-4 p-3">
+      <div class="grid auto-rows-min gap-4 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2">
         <Card v-for="item in species" :key="item._id" class="aspect-video rounded-xl bg-muted/50 pt-4 pb-4">
           <CardHeader>
             <CardTitle class="mb-3">{{item.CommonName}}</CardTitle>
             <CardDescription>學名:  {{item.ScientificName}}</CardDescription>
           </CardHeader>
           <CardContent>
-            <div class="w-full">
-            <AspectRatio  :ratio="16 / 9">
-              <img :src="item.imageUrl" :alt="item.name" class="rounded-md object-cover w-full h-full bg-gray-300">
-            </AspectRatio>
+            <div class="w-full max-w-3/4">
+              <AspectRatio  :ratio="2 / 1">
+                <img :src="item.imageUrl" :alt="item.name" class="rounded-md object-cover w-full h-full bg-gray-300">
+              </AspectRatio>
           </div>
           </CardContent>
           <CardFooter >
