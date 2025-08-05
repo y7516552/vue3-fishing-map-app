@@ -121,6 +121,32 @@ const fillerData = (search={query:"",city:""}) => {
     openUpdate.value=false
   }
 
+  const updateItem = async(item)=> {
+    let apiUrl = baseApiUrl+dataType.value
+    loading.value = true
+    try {
+      if(item._id) {
+        await fishingTackleShopAPI.put(apiUrl+`/${item._id}`,item)
+      }else{
+        await fishingTackleShopAPI.post(apiUrl,item)
+      }
+      
+      openUpdate.value = false
+      fetchData(dataType.value)
+      loading.value = false
+      toast.success('資料更新成功')
+    } catch (error) {
+      console.log(error)
+      if(error.status === 403) {
+        // router.push({name: 'NoAccess'})
+        console.log('403')
+      }else{
+        toast.warning('資料更新失敗')
+        loading.value = false
+      }
+    }
+  }
+
 
   const openMsg = ref(false)
   const MsgData = ref({
@@ -134,8 +160,8 @@ const fillerData = (search={query:"",city:""}) => {
     MsgData.value.item = item
   }
 
-  const deleteItem = async(item)=> {
-    let apiUrl =baseApiUrl+dataType.value+item._id
+  const deleteItem = async(id)=> {
+    let apiUrl =baseApiUrl+dataType.value+'/'+id
     loading.value = true
     try {
         const { data } = await fishingTackleShopAPI.delete(apiUrl)
@@ -146,7 +172,8 @@ const fillerData = (search={query:"",city:""}) => {
     } catch (error) {
         console.log(error)
         if(error.status === 403) {
-            router.push({name: 'NoAccess'})
+          // router.push({name: 'NoAccess'})
+          console.log('403')
         }else{
             toast.warning('項目刪除失敗')
             loading.value = false
@@ -182,7 +209,8 @@ const fillerData = (search={query:"",city:""}) => {
             <TableCell>{{ item.phone }}</TableCell>
             <TableCell>{{ item.city }}</TableCell>
             <TableCell  class="text-center">
-              {{ item.status }}
+              <p v-if="item.status==1" class="text-green-500">啟用</p>
+              <p v-if="item.status==0" class="text-red-500">隱藏</p>
             </TableCell>
             <TableCell class="text-center">
               <Button @click="openUpdateDialog('edit',item)" variant="outline">
@@ -196,7 +224,7 @@ const fillerData = (search={query:"",city:""}) => {
         </TableBody>
       </Table>
     </div>
-    <FishingTackleShopUpdateDialog :openUpdateDialog="openUpdate" :dataType="dataType" :data="updateData" @close="closeUpdateDialog"></FishingTackleShopUpdateDialog>
+    <FishingTackleShopUpdateDialog :openUpdateDialog="openUpdate" :dataType="dataType" :data="updateData" @close="closeUpdateDialog"  @updateItem="updateItem"></FishingTackleShopUpdateDialog>
     <DashboardMessageDialog :data="MsgData" :open="openMsg" @close="()=> {openMsg=false}" @deleteItem="deleteItem"></DashboardMessageDialog>
   </div>
 </template>

@@ -53,7 +53,7 @@ const dataForm = {
   type:z.string(),
   title:z.string(),
   description:z.string(),
-  imageList: z.optional(z.array(z.string())),
+  imageUrlList: z.optional(z.array(z.string())),
   status:z.optional(z.number())
 }
 
@@ -149,7 +149,7 @@ const updateState = (e) => {
 
 const onSubmit = handleSubmit((values) =>{
     isOpen.value = false
-    if(downloadURL.value) values.imageList = [downloadURL.value]
+    if(downloadURL.value) values.imageUrlList = [downloadURL.value]
 
     isUpdate.value = false
     emit('updateItem',values)

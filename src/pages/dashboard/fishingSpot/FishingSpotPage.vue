@@ -1,8 +1,9 @@
 <script setup>
 import axios from 'axios';
-import dashboardSearchbar from './dashboardSearchbar.vue';
-import DashboardUpdateDialog from './dashboardUpdateDialog.vue';
-import DashboardMessageDialog from './dashboardMessageDialog.vue';
+import { useCookies } from '@vueuse/integrations/useCookies'
+import dashboardSearchbar from '../dashboardSearchbar.vue';
+import FishingSpotUpdateDialog from './FishingSpotUpdateDialog.vue';
+import DashboardMessageDialog from '../dashboardMessageDialog.vue';
 import {
   Table,
   TableBody,
@@ -17,6 +18,7 @@ import { Button } from '@/components/ui/button'
 import { ref, onMounted } from 'vue';
 import {  useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
+import { AspectRatio } from '@/components/ui/aspect-ratio'
 
 const router = useRouter()
 
@@ -27,8 +29,9 @@ const selectField = ref({
 
 const tableHead =[
   "name",
-  "phone",
   "city",
+  "type",
+  "imageUrl",
   "status",
   "action"
 ]
@@ -36,18 +39,6 @@ const tableHead =[
 const dataType = ref('fishingSpot')
 
 const dataForm = {
-  fishingTackleShop:{
-    placesId:"",
-    address:"",
-    googleMapsUri:"",
-    name:"",
-    phone:"",
-    locations:{
-      type: "Point",
-      coordinates: [0,0],
-    },
-    city:""
-  },
   fishingSpot:{
     name:"",
     description:"",
@@ -61,18 +52,6 @@ const dataForm = {
     },
     city:""
   },
-  species:{
-    CommonName:"",
-    ScientificName:"",
-    imageUrl:"",
-    fishDBUrl:"",
-  },
-  report:{
-    type:"",
-    title:"",
-    description:"",
-    imageUrlList:"",
-  }
 }
 
 const pageData = ref([])
@@ -81,11 +60,23 @@ const loading = ref(false)
 
 const baseApiUrl=import.meta.env.VITE_APP_API_URL//+"admin/"
 
+const cookies = useCookies(['fishingMap'])
+const token = cookies.getAll().fishingMap
+
+const fishingSpotAPI = axios.create({
+  headers: {
+    "Content-Type": "application/json; charset=utf-8",
+    Accept: "application/json",
+    Authorization:`${token}`
+  },
+});
+
+
 const fetchData = async(type) => {
     let apiUrl =baseApiUrl+type
     loading.value = true
     try {
-        const { data } = await axios.get(apiUrl)
+        const { data } = await fishingSpotAPI.get(apiUrl)
         
         pageData.value = data.result
         pageFillterdData.value = data.result
@@ -132,6 +123,33 @@ const fillerData = (search={query:"",city:""}) => {
   }
 
 
+  const updateItem = async(item)=> {
+    let apiUrl = baseApiUrl+dataType.value
+    loading.value = true
+    try {
+      if(item._id) {
+        await fishingSpotAPI.put(apiUrl+`/${item._id}`,item)
+      }else{
+        await fishingSpotAPI.post(apiUrl,item)
+      }
+      
+      openUpdate.value = false
+      fetchData(dataType.value)
+      loading.value = false
+      toast.success('資料更新成功')
+    } catch (error) {
+      console.log(error)
+      if(error.status === 403) {
+        // router.push({name: 'NoAccess'})
+        console.log('403')
+      }else{
+        toast.warning('資料更新失敗')
+        loading.value = false
+      }
+    }
+  }
+
+
   const openMsg = ref(false)
   const MsgData = ref({
     item:{name:''},
@@ -144,11 +162,11 @@ const fillerData = (search={query:"",city:""}) => {
     MsgData.value.item = item
   }
 
-  const deleteItem = async(item)=> {
-    let apiUrl =baseApiUrl+dataType.value+item._id
+  const deleteItem = async(id)=> {
+    let apiUrl =baseApiUrl+dataType.value+'/'+id
     loading.value = true
     try {
-        const { data } = await axios.delete(apiUrl)
+        const { data } = await fishingSpotAPI.delete(apiUrl)
         if(data.result)
         loading.value = false
         toast.success('項目刪除成功')
@@ -180,33 +198,24 @@ const fillerData = (search={query:"",city:""}) => {
         <TableCaption>A list of {{ dataType }}.</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead v-for="item in tableHead" :key="item" >{{ item }}</TableHead>
-            <!-- <TableHead class="w-[100px]">
-              Invoice
-            </TableHead>
-            <TableHead>Method</TableHead>
-            <TableHead class="text-right">
-              Amount
-            </TableHead> -->
+            <TableHead v-for="item in tableHead" :key="item" class="font-medium">{{ item }}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          <!-- <TableRow>
-            <TableCell class="font-medium">
-              INV001
-            </TableCell>
-            <TableCell>Paid</TableCell>
-            <TableCell>Credit Card</TableCell>
-            <TableCell class="text-right">
-              $250.00
-            </TableCell>
-          </TableRow> -->
+          
           <TableRow v-for="item in pageFillterdData" :key="item._id">
             <TableCell class="font-medium">
               {{ item.name }}
             </TableCell>
-            <TableCell>{{ item.phone }}</TableCell>
             <TableCell>{{ item.city }}</TableCell>
+            <TableCell>{{ item.type }}</TableCell>
+            <TableCell  class="flex justify-center">
+              <div class="w-[200px]">
+                <AspectRatio :ratio="16 / 9">
+                  <img :src="item.imageUrl" :alt="item.name" class="rounded-md object-cover w-full h-full">
+                </AspectRatio>
+              </div>
+            </TableCell>
             <TableCell  class="text-center">
               {{ item.status }}
             </TableCell>
@@ -222,7 +231,7 @@ const fillerData = (search={query:"",city:""}) => {
         </TableBody>
       </Table>
     </div>
-    <DashboardUpdateDialog :openUpdateDialog="openUpdate" :dataType="dataType" :data="updateData" @close="()=> {openUpdate=false}"></DashboardUpdateDialog>
+    <FishingSpotUpdateDialog :openUpdateDialog="openUpdate" :dataType="dataType" :data="updateData" @close="()=> {openUpdate=false}" @updateItem="updateItem"></FishingSpotUpdateDialog>
     <DashboardMessageDialog :data="MsgData" :open="openMsg" @close="()=> {openMsg=false}" @deleteItem="deleteItem"></DashboardMessageDialog>
   </div>
 </template>

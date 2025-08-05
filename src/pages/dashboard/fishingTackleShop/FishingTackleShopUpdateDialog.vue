@@ -27,11 +27,13 @@ import {
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
 
+const cityList = ["基隆市", "臺北市", "新北市", "桃園市", "新竹市", "新竹縣", "苗栗縣", "臺中市", "彰化縣", "南投縣", "雲林縣", "嘉義市", "嘉義縣", "臺南市", "高雄市", "屏東縣", "宜蘭縣", "花蓮縣", "臺東縣", "澎湖縣"]
 
 
 
@@ -61,13 +63,14 @@ watch(props,() =>{
 
 
 const dataForm = z.object({
+  _id:z.optional(z.string()),
   placesId:z.string(),
   address:z.string(),
   googleMapsUri:z.string().url(),
   name:z.string(),
-  phone:z.string(),
+  phone:z.optional(z.string()),
   locations:z.object({
-    type: z.optional(z.literal("Point")),
+    type: z.string().default("Point"),
     coordinates: z.array(z.number()).length(2),
   }),
   city:z.string()
@@ -86,7 +89,6 @@ watch(props,() =>{
   }
 })
 
-const cityList = ["基隆市", "臺北市", "新北市", "桃園市", "新竹市", "新竹縣", "苗栗縣", "臺中市", "彰化縣", "南投縣", "雲林縣", "嘉義市", "嘉義縣", "臺南市", "高雄市", "屏東縣", "宜蘭縣", "花蓮縣", "臺東縣", "澎湖縣"]
 
 const isLoading =ref(false)
 
@@ -94,7 +96,8 @@ const isLoading =ref(false)
 const onSubmit = handleSubmit((values) => {
   isLoading.value = true
   emit('updateItem',values)
-   resetForm({
+  
+  resetForm({
     values: {},
   });
 })
@@ -250,8 +253,10 @@ const closeDialog = () => {
                           <SelectValue placeholder="選擇縣市" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
-                        <SelectItem v-for="item in cityList" :key="item" :value="item" >{{ item }}</SelectItem>
+                      <SelectContent class="z-1000">
+                         <SelectGroup>
+                          <SelectItem v-for="item in cityList" :key="item" :value="item" >{{ item }}</SelectItem>
+                         </SelectGroup>
                       </SelectContent>
                     </Select>
                     <FormDescription>
