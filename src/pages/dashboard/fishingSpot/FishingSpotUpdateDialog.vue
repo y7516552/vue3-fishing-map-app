@@ -1,5 +1,5 @@
 <script setup>
-import { LoaderCircle} from 'lucide-vue-next'
+import { LoaderCircle, MapPin} from 'lucide-vue-next'
 import {
   Dialog,
   DialogOverlay,
@@ -40,6 +40,7 @@ import { storage } from '@/firebase/index';
 import { ref as storageRef, uploadBytesResumable, getDownloadURL,deleteObject } from 'firebase/storage';
 import { AspectRatio } from '@/components/ui/aspect-ratio'
 import { Progress } from '@/components/ui/progress'
+import LngLatDialog from '@/components/LngLatDialog.vue';
 
 const cityList = ["基隆市", "臺北市", "新北市", "桃園市", "新竹市", "新竹縣", "苗栗縣", "臺中市", "彰化縣", "南投縣", "雲林縣", "嘉義市", "嘉義縣", "臺南市", "高雄市", "屏東縣", "宜蘭縣", "花蓮縣", "臺東縣", "澎湖縣"]
 
@@ -95,7 +96,7 @@ const dataForm = z.object({
 
 const formSchema = toTypedSchema(dataForm)
 
-const  { handleSubmit ,setValues,resetForm} = useForm({
+const  { handleSubmit ,setValues,resetForm , setFieldValue} = useForm({
   validationSchema: formSchema,
   initialValues: {
     fishingAllowed: true,
@@ -185,6 +186,13 @@ const closeDialog = () => {
 }
 
 
+const openLngLatDialog = ref(false)
+const lnglat = ref([])
+const updateLngLat = (data) => {
+  lnglat.value = data
+  setFieldValue("locations.coordinates",data)
+}
+
 </script>
 
 <template>
@@ -193,7 +201,6 @@ const closeDialog = () => {
       <DialogScrollContent class="z-1000 ">
         <DialogTitle>{{ title }}</DialogTitle>
         <DialogDescription>
-          {{ props.data }}
         </DialogDescription>
         <div :class="cn('flex flex-col gap-6 ')">
           <form @submit="onSubmit">
@@ -327,13 +334,19 @@ const closeDialog = () => {
               </div>
                 
 
+              <div class="">
+                <Button type="button" @click="openLngLatDialog=true"> 
+                  <MapPin />
+                  從地圖選取
+                </Button>
+              </div>
 
               <div class="grid gap-3">
                 <FormField v-slot="{ componentField }" name="locations.coordinates[0]">
                   <FormItem>
                     <FormLabel>經度</FormLabel>
                     <FormControl>
-                      <Input type="number" step=0.00000001  v-bind="componentField" required/>
+                      <Input type="number" step=0.0000000000000001  v-bind="componentField" required/>
                     </FormControl>
                     <FormDescription>
                       請輸入經度
@@ -348,7 +361,7 @@ const closeDialog = () => {
                   <FormItem>
                     <FormLabel>緯度</FormLabel>
                     <FormControl>
-                      <Input type="number" step=0.00000001  v-bind="componentField" required/>
+                      <Input type="number" step=0.0000000000000001  v-bind="componentField" required/>
                     </FormControl>
                     <FormDescription>
                       請輸入緯度
@@ -391,6 +404,26 @@ const closeDialog = () => {
           <div class="loading bg-gray-800 opacity-50 absolute bottom-0 left-0 w-full h-full  justify-center items-center " :class="[isLoading ? 'flex':'hidden']">
             <LoaderCircle size="128" color="white" class="mr-3 animate-spin"/>
           </div>
+          <Dialog v-model:open="openLngLatDialog" >
+            <DialogOverlay  class="z-1000">
+              <DialogScrollContent class="z-1000 ">
+                <DialogTitle>修改經緯度</DialogTitle>
+                <DialogDescription>
+                  <div v-if="lnglat" class="">
+                    <p>
+                      經度：{{ lnglat[0] }}
+                    </p>
+                    <p>
+                      緯度：{{ lnglat[1] }}
+                    </p>
+                  </div>
+                </DialogDescription>
+
+                 <LngLatDialog  :data="lnglat" @updateLngLat="updateLngLat"></LngLatDialog>
+              </DialogScrollContent>
+            </DialogOverlay>
+          </Dialog>
+          <!-- <LngLatDialog :openLngLatDialog="openLngLatDialog" :data="lnglat" @close="()=> {openLngLatDialog=false}" ></LngLatDialog> -->
         </div>
       </DialogScrollContent>
     </DialogOverlay>

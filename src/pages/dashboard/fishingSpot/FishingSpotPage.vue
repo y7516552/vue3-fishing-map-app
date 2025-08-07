@@ -39,26 +39,24 @@ const tableHead =[
 const dataType = ref('fishingSpot')
 
 const dataForm = {
-  fishingSpot:{
-    name:"",
-    description:"",
-    imageUrl:"",
-    imageUrlList:"",
-    type:"",
-    fishingAllowed: true,
-    locations:{
-      type: "Point",
-      coordinates: [0,0],
-    },
-    city:""
+  name:"",
+  description:"",
+  imageUrl:"",
+  imageUrlList:"",
+  type:"",
+  fishingAllowed: true,
+  locations:{
+    type: "Point",
+    coordinates: [null,null],
   },
+  city:""
 }
 
 const pageData = ref([])
 const pageFillterdData = ref([])
 const loading = ref(false)
 
-const baseApiUrl=import.meta.env.VITE_APP_API_URL//+"admin/"
+const baseApiUrl=import.meta.env.VITE_APP_API_URL+"admin/"
 
 const cookies = useCookies(['fishingMap'])
 const token = cookies.getAll().fishingMap
@@ -117,7 +115,7 @@ const fillerData = (search={query:"",city:""}) => {
   const openUpdate = ref(false)
   const updateData = ref({})
   const openUpdateDialog = (type = 'create', data ) => {
-    updateData.value = dataForm[dataType.value]
+    if(type=='create')updateData.value = {...dataForm}
     if(type=='edit') updateData.value = data
     openUpdate.value = true
   }
@@ -157,7 +155,6 @@ const fillerData = (search={query:"",city:""}) => {
   })
 
   const openDeleteDialog = (item)=> {
-    console.log('open',item)
     openMsg.value = true
     MsgData.value.item = item
   }
@@ -188,7 +185,7 @@ const fillerData = (search={query:"",city:""}) => {
   <div>
     <div class="flex p-4" >
       <dashboardSearchbar :selectField="selectField" @search-update="fillerData"/>
-      <Button @click="openUpdateDialog" class="ml-auto mr-0"> 
+      <Button @click="openUpdateDialog('create')" class="ml-auto mr-0"> 
         <CirclePlus/>
         新增 
       </Button>
@@ -217,7 +214,8 @@ const fillerData = (search={query:"",city:""}) => {
               </div>
             </TableCell>
             <TableCell  class="text-center">
-              {{ item.status }}
+              <p v-if="item.status==1" class="text-green-500">啟用</p>
+              <p v-if="item.status==0" class="text-red-500">隱藏</p>
             </TableCell>
             <TableCell class="text-center">
               <Button class="mx-2" @click="openUpdateDialog('edit',item)" variant="outline">

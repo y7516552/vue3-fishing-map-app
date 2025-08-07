@@ -217,7 +217,7 @@ const closeDialog = () => {
                   <FormItem>
                     <FormLabel>經度</FormLabel>
                     <FormControl>
-                      <Input type="text"  v-bind="componentField" required/>
+                      <Input type="number" step=0.0000000000000001  v-bind="componentField" required/>
                     </FormControl>
                     <FormDescription>
                       請輸入經度
@@ -232,7 +232,7 @@ const closeDialog = () => {
                   <FormItem>
                     <FormLabel>緯度</FormLabel>
                     <FormControl>
-                      <Input type="text"  v-bind="componentField" required/>
+                      <Input type="number" step=0.0000000000000001  v-bind="componentField" required/>
                     </FormControl>
                     <FormDescription>
                       請輸入緯度
