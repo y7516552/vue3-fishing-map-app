@@ -1,6 +1,7 @@
 <script setup >
+import axios from 'axios';
 import { toTypedSchema } from '@vee-validate/zod'
-import { ref, watch } from 'vue' 
+import { ref, watch ,computed, onBeforeMount} from 'vue' 
 import * as z from 'zod'
 
 import { Button } from '@/components/ui/button'
@@ -21,14 +22,9 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { useFilter } from "reka-ui"
+import { Combobox, ComboboxAnchor, ComboboxEmpty, ComboboxGroup, ComboboxInput, ComboboxItem, ComboboxList } from "@/components/ui/combobox"
+import { TagsInput, TagsInputInput, TagsInputItem, TagsInputItemDelete, TagsInputItemText } from "@/components/ui/tags-input"
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
@@ -37,9 +33,41 @@ import { storage } from '@/firebase/index';
 import { ref as storageRef, uploadBytesResumable, getDownloadURL,deleteObject } from 'firebase/storage';
 import { AspectRatio } from '@/components/ui/aspect-ratio'
 
+//catchs
+const speciesList= ref([])
+
+const getSpeciesList = async () => {
+  try {
+    const baseApiUrl=import.meta.env.VITE_APP_API_URL
+    const response = await axios.get(`${baseApiUrl}species`);
+    speciesList.value = response.data.result;
+  } catch (error) {
+    console.error('Error fetching species list:', error);
+  }
+};
+
+onBeforeMount(() => {
+  getSpeciesList()
+})
+
+
+const modelValue = ref([])
+
+const openTagInput = ref(false)
+
+const searchTerm = ref("")
+
+const { contains } = useFilter({ sensitivity: "base" })
+
+
+const filteredspeciesList = computed(() => {
+  const options = speciesList.value.filter(i => !modelValue.value.includes(i.CommonName))
+  return searchTerm.value ? options.filter(option => contains(option.CommonName, searchTerm.value)) : options
+})
+
 
 const props = defineProps(['open'])
-const emit = defineEmits(['close','sendReport'])
+const emit = defineEmits(['close','addReview'])
 
 const isOpen = ref(false)
 
@@ -90,20 +118,7 @@ const removeImg = async fullPath => {
   }
 };
 
-const typeList = [
-  {
-    name:'資料勘誤',
-    value:'data'
-  },
-  {
-    name:'建議',
-    value:'suggestion'
-  },
-  {
-    name:'錯誤回報',
-    value:'error'
-  }
-]
+
 
 watch(props,() =>{
     isOpen.value = false
@@ -121,8 +136,8 @@ const formSchema = toTypedSchema(z.object({
   fishingSpotId:z.string(),
   title:z.string(),
   description:z.string(),
-  imageUrl:z.string(),
-  imageUrlList:z.string(),
+  imageUrl:z.optional(z.string()),
+  imageUrlList:z.optional(z.string()),
   catchs:z.string(),
   rating:z.string(),
   bait:z.string()
@@ -130,49 +145,28 @@ const formSchema = toTypedSchema(z.object({
 
 function onSubmit(values) {
     isOpen.value = false
-    toast.success('回報成功', {
-        description: '謝謝您的回饋',
-    })
-    emit('sendReport',values)
+    console.log('onSubmit',values)
+    emit('addReview',values)
 }
+
+
+
 </script>
 
 <template>
-  <Form  v-slot="{ handleSubmit }" as="" keep-values :validation-schema="formSchema">
-    <Dialog v-model:open="isOpen" @update:open="updateState">
-      <DialogContent class="sm:max-w-[425px]">
+  <Form  v-slot="{ handleSubmit }" as="" keep-values :validation-schema="formSchema" >
+    <Dialog v-model:open="isOpen" @update:open="updateState" class="z-1000">
+      <DialogContent class="sm:max-w-[425px] z-1000">
         <DialogHeader>
-          <DialogTitle>回報問題</DialogTitle>
+          <DialogTitle>評論</DialogTitle>
           <DialogDescription>
-            網站有任何問題都可以在這裡回報
+            請寫下對此釣點的評論
           </DialogDescription>
         </DialogHeader>
 
         <form id="dialogForm" @submit="handleSubmit($event, onSubmit)">
-          <div class="mb-3">
-            <FormField v-slot="{ componentField }" name="type"  class="mb-3">
-              <FormItem>
-                <FormLabel>類型</FormLabel>
-        
-                  <Select v-bind="componentField">
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="請選擇回報類型" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectItem v-for="item in typeList" :key="item.value" :value="item.value">
-                          {{item.name}}
-                        </SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-              </FormItem>
-            </FormField>
-          </div>
           
+    
           <div class="mb-3">
             <FormField v-slot="{ componentField }" name="title"  class="mb-3">
               <FormItem v-auto-animate>
@@ -181,7 +175,7 @@ function onSubmit(values) {
                   <Input type="text" placeholder="請輸入標題" v-bind="componentField" />
                 </FormControl>
                 <FormDescription>
-                  例如:回報資料錯誤-釣點
+                  例如:XX月XX日釣遊感想
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -201,7 +195,75 @@ function onSubmit(values) {
                   ></Textarea>
                 </FormControl>
                 <FormDescription>
-                  請具體描述要回報的問題
+                  請簡短描述釣遊過程或釣況
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+          </div>
+
+          <div class="mb-3">
+            <FormField v-slot="{ componentField }" name="bait"  class="mb-3">
+              <FormItem v-auto-animate>
+                <FormLabel>餌料</FormLabel>
+                <FormControl>
+                  <Input type="text" placeholder="請輸入餌料" v-bind="componentField" />
+                </FormControl>
+                <FormDescription>
+                  例如:粉餌、活餌、假餌等
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+          </div>
+
+          <div class="mb-3">
+
+            <FormField v-slot="{ componentField }" name="catchs">
+              <FormItem>
+                <FormLabel>漁獲種類</FormLabel>
+                <FormControl>
+
+                  <Combobox v-bind="componentField" v-model="modelValue" v-model:open="openTagInput" :ignore-filter="true">
+                    <ComboboxAnchor as-child>
+                      <TagsInput v-model="modelValue" class="px-2 gap-2 w-80">
+                        <div class="flex gap-2 flex-wrap items-center">
+                          <TagsInputItem v-for="item in modelValue" :key="item" :value="item">
+                            <TagsInputItemText />
+                            <TagsInputItemDelete />
+                          </TagsInputItem>
+                        </div>
+                
+                        <ComboboxInput v-model="searchTerm" as-child>
+                          <TagsInputInput placeholder="漁獲種類..." class="min-w-[200px] w-full p-0 border-none focus-visible:ring-0 h-auto" @keydown.enter.prevent />
+                        </ComboboxInput>
+                      </TagsInput>
+                
+                      <ComboboxList class="w-[--reka-popper-anchor-width] z-1200">
+                        <ComboboxEmpty />
+                        <ComboboxGroup>
+                          <ComboboxItem
+                            v-for="species in filteredspeciesList" :key="species._id" :value="species.CommonName"
+                            @select.prevent="(ev) => {
+                              if (typeof ev.detail.value === 'string') {
+                                searchTerm = ''
+                                modelValue.push(ev.detail.value)
+                              }
+
+                              if (speciesList.length === 0) {
+                                openTagInput = false
+                              }
+                            }"
+                          >
+                            {{ species.CommonName }}
+                          </ComboboxItem>
+                        </ComboboxGroup>
+                      </ComboboxList>
+                    </ComboboxAnchor>
+                  </Combobox>
+                </FormControl>
+                <FormDescription>
+                  請輸入漁獲種類
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -229,15 +291,7 @@ function onSubmit(values) {
             </div>
 
             <p v-else >圖片顯示於此</p>
-            <!-- <FormField  >
-              <FormItem>
-                <FormLabel>圖片</FormLabel>
-                <FormControl>
-                  <Input @change="handleFileUpload" type="file"  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            </FormField> -->
+           
               
           </div>
             

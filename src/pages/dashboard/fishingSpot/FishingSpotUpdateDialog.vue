@@ -6,6 +6,7 @@ import {
   DialogScrollContent,
   DialogDescription,
   DialogTitle,
+  DialogClose,
 } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -409,13 +410,21 @@ const updateLngLat = (data) => {
               <DialogScrollContent class="z-1000 ">
                 <DialogTitle>修改經緯度</DialogTitle>
                 <DialogDescription>
-                  <div v-if="lnglat" class="">
-                    <p>
-                      經度：{{ lnglat[0] }}
-                    </p>
-                    <p>
-                      緯度：{{ lnglat[1] }}
-                    </p>
+                  <div class="flex justify-between items-center">
+
+                    <div v-if="lnglat" >
+                      <p>
+                        經度：{{ lnglat[0] }}
+                      </p>
+                      <p>
+                        緯度：{{ lnglat[1] }}
+                      </p>
+                    </div>
+                    <DialogClose as-child>
+                      <Button :disabled="!lnglat" type="button" class="bg-blue-500 text-white hover:bg-blue-600">
+                        確定
+                      </Button>
+                    </DialogClose>
                   </div>
                 </DialogDescription>
 
@@ -423,7 +432,6 @@ const updateLngLat = (data) => {
               </DialogScrollContent>
             </DialogOverlay>
           </Dialog>
-          <!-- <LngLatDialog :openLngLatDialog="openLngLatDialog" :data="lnglat" @close="()=> {openLngLatDialog=false}" ></LngLatDialog> -->
         </div>
       </DialogScrollContent>
     </DialogOverlay>

@@ -10,7 +10,6 @@ const LngLat = ref([null,null])
 
 watch(props,() =>{
   if(props.data[0]&&props.data[1]){
-    console.log(props.data,L)
     LngLat.value = props.data
   }
 })

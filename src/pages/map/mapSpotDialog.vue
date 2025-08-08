@@ -22,6 +22,7 @@ import { AspectRatio } from '@/components/ui/aspect-ratio'
 import StarRating from 'vue-star-rating'
 import ReviewsAuthor from './reviews/ReviewsAuthor.vue'
 import MessageDialog from '@/components/MessageDialog.vue'
+import ReviewDialog from './reviews/ReviewDialog.vue'
 
 
 import { inject ,ref, watch} from 'vue'
@@ -121,11 +122,23 @@ const dislikeSpot = async (id) => {
 
 const reviewDailog = ref(false)
 const openReviewDailog = () => {
-  reviewDailog.value = true
+  console.log('openReviewDailog')
+  if(!isLogin.value){
+    MsgData.value = {
+      title:'請先登入',
+      description:'登入才能使用此功能',
+      status:'danger'
+    }
+      openMsg.value = true
+  }else{
+
+    reviewDailog.value = true
+  }
 }
 
-const addReview = async(spotId)=>{
+const addReview = async(data)=>{
   try{
+    console.log('addReview',data)
     // loading.value = true
     // let apiUrl = `http://localhost:3000/api/v1/fishingSpot/${id}/dislike`
     // const { data } = await axios.get(apiUrl)
@@ -201,7 +214,7 @@ const addReview = async(spotId)=>{
           </DialogHeader>
 
           <DialogFooter class="mx-6 mb-6">
-            <Button v-if="isLogin" variant="outline">
+            <Button v-if="isLogin" variant="outline" @click="openReviewDailog">
               新增評論
             </Button>
             <Button v-else variant="outline" disabled>
@@ -252,6 +265,7 @@ const addReview = async(spotId)=>{
             <LoaderCircle size="128" color="white" class="mr-3 animate-spin"/>
           </div>
           <MessageDialog class="z-1000" :data="MsgData" :open="openMsg" @close="()=> {openMsg=false}"></messageDialog>
+          <ReviewDialog :open="reviewDailog" @close="()=> {reviewDailog=false}" @addReview="addReview"></ReviewDialog>
         </DialogScrollContent>
     </DialogOverlay>
   </Dialog>
