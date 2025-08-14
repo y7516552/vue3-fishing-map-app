@@ -2,7 +2,7 @@ import axios from 'axios';
 import { ref } from 'vue'
 import { toast } from 'vue-sonner'
 
-const apiUrl = 'http://localhost:3000/api/v1/fishingSpot'
+const apiUrl = import.meta.env.VITE_APP_API_URL+'fishingSpot'
 
 
 export function useFishingSpot() {

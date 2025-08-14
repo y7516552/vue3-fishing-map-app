@@ -1,7 +1,5 @@
 <script setup>
-import axios from 'axios';
 import { ref, onMounted } from 'vue'
-import { toast } from 'vue-sonner'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -14,43 +12,66 @@ import {
 } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { MapPinned , LoaderCircle ,Info} from 'lucide-vue-next'
-import MessageDialog from '@/components/MessageDialog.vue'
+// import MessageDialog from '@/components/MessageDialog.vue'
+import{ useFishingTackleShop}  from '@/composable/fishingTackleShop'
+import { useUserStore }from'@/stores/user'
+import { storeToRefs } from 'pinia'
 
-const apiUrl = 'http://localhost:3000/api/v1/fishingTackleShop'
-const fishingTackleShops =ref({})
-const loading = ref(false)
+const { loading, fishingTackleShops, getFishingTackleShops } = useFishingTackleShop()
+
 const cityList = ["全部","基隆市", "臺北市", "新北市", "桃園市", "新竹市", "新竹縣", "苗栗縣", "臺中市", "彰化縣", "南投縣", "雲林縣", "嘉義市", "嘉義縣", "臺南市", "高雄市", "屏東縣", "宜蘭縣", "花蓮縣", "臺東縣", "澎湖縣"]
 const city = ref("全部")
+const filteredData = ref({})
 
 
-const  getFishingTackleShops = async () => {
-    loading.value = true
-    try {
-        const { data } = await axios.get(apiUrl)
-        cityList.forEach((e) => {
-          fishingTackleShops.value[e]=[]
-        })
 
-        fishingTackleShops.value["全部"] = data.result
 
-        data.result.forEach(item =>{
-          fishingTackleShops.value[item.city].push(item)
-        })
-
-        loading.value = false
-    } catch (error) {
-        console.log(error)
-        toast.warning('資料取得失敗')
-        loading.value = false
-    }
-      
-    
-
-  }
 
   onMounted(async()=>{
     await getFishingTackleShops()
+
+    cityList.forEach((e) => {
+      filteredData.value[e]=[]
+    })
+
+        filteredData.value["全部"] = fishingTackleShops.value
+
+        fishingTackleShops.value.forEach(item =>{
+         filteredData.value[item.city].push(item)
+        })
   })
+
+
+  const store = useUserStore()
+  const { isLogin, userData} = storeToRefs(store)
+  const openMsg = ref(false)
+  const MsgData =ref({
+    title:'',
+    description:'',
+    status:''
+  })
+  const openReport = ref(false)
+
+  const openReportDialog = () =>{
+    if(!isLogin.value){
+      MsgData.value = {
+        title:'請先登入',
+        description:'登入才能使用此功能',
+        status:'danger'
+      }
+      openMsg.value = true
+    }else{
+
+      openReport.value = true
+    }
+  }
+
+  const sendReport = (data) => {
+    openReport.value = false
+    console.log(data,userData)
+  }
+
+
 </script>
 
 <template>
@@ -58,9 +79,15 @@ const  getFishingTackleShops = async () => {
     <div class="flex gap-4 flex-wrap p-4">
       <Button v-for="item in cityList" :key="item" @click="city=item" class="" :variant="city===item ? 'outline' : ''"> {{item}}</Button>
     </div>
+    <div class="p-4">
+      <Button variant="outline" @click="openReportDialog">
+        <Info/>
+        問題回報
+      </Button>
+    </div>
     <div class="flex flex-1 flex-col gap-4 p-4">
       <div class="grid auto-rows-min gap-4 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 ">
-        <Card v-for="item in fishingTackleShops[city]" :key="item._id" class="aspect-video rounded-xl bg-muted/50 pt-4 pb-4">
+        <Card v-for="item in filteredData[city]" :key="item._id" class="aspect-video rounded-xl bg-muted/50 pt-4 pb-4">
           <CardHeader>
             <CardTitle class="mb-3">{{item.name}}</CardTitle>
             <CardDescription>電話:  {{ item.phone }}</CardDescription>
@@ -92,6 +119,6 @@ const  getFishingTackleShops = async () => {
     <div class="loading bg-gray-800 opacity-50 absolute bottom-0 left-0 w-full h-full  justify-center items-center " :class="[loading ? 'flex':'hidden']">
       <LoaderCircle size="128" color="white" class="mr-3 animate-spin"/>
     </div>
-    <MessageDialog class="z-1000" :data="MsgData" :open="openMsg" @close="()=> {openMsg=false}"></messageDialog>
+    <MessageDialog class="z-1000" :data="MsgData" :open="openMsg" @close="()=> {openMsg=false}"></MessageDialog>
   </div>
 </template>

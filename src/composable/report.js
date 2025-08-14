@@ -3,7 +3,7 @@ import { useCookies } from '@vueuse/integrations/useCookies'
 import { ref } from 'vue'
 import { toast } from 'vue-sonner'
 
-const apiUrl = 'http://localhost:3000/api/v1/report'
+const apiUrl = import.meta.env.VITE_APP_API_URL+'report'
 const cookies = useCookies(['fishingMap'])
 const token = cookies.getAll().fishingMap
 

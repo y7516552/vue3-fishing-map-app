@@ -1,5 +1,4 @@
 <script setup>
-import axios from 'axios';
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -10,35 +9,20 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { AspectRatio } from '@/components/ui/aspect-ratio'
-import { ref, onMounted } from 'vue'
-import { toast } from 'vue-sonner'
+import { ref, onMounted,watch } from 'vue'
 import {Info} from 'lucide-vue-next';
 import MessageDialog from '@/components/MessageDialog.vue'
 import ReportDialog from '@/components/ReportDialog.vue'
+import { useSpecies } from '@/composable/species'
 import { useUserStore }from'@/stores/user'
 import { storeToRefs } from 'pinia'
 
-const apiUrl = 'http://localhost:3000/api/v1/species'
-const species = ref([])
-const loading = ref(false)
+  const { species, loading, error, getSpecies } = useSpecies()
 
-const  getSpecies = async () => {
-    loading.value = true
-    try {
-        const { data } =await axios.get(apiUrl)
-        species.value = data.result
-        loading.value = false
-    } catch (error) {
-        console.log(error)
-        toast.warning('資料取得失敗', {
-            description: error,
-        })
-        loading.value = false
-    }
-      
-    
+  watch(error,()=>{
+    console.log('error',error.value)
+  })
 
-  }
   onMounted(async()=>{
     await getSpecies()
   })
@@ -85,7 +69,17 @@ const  getSpecies = async () => {
     </div>
     
     <div class="flex flex-1 flex-col gap-4 p-3">
-      <div class="grid auto-rows-min gap-4 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2">
+
+      <div v-if="loading" class="grid auto-rows-min gap-4 md:grid-cols-3">
+        <div class="aspect-video rounded-xl bg-muted/50" />
+        <div class="aspect-video rounded-xl bg-muted/50" />
+        <div class="aspect-video rounded-xl bg-muted/50" />
+        <div class="aspect-video rounded-xl bg-muted/50" />
+        <div class="aspect-video rounded-xl bg-muted/50" />
+        <div class="aspect-video rounded-xl bg-muted/50" />
+      </div>
+
+      <div v-else class="grid auto-rows-min gap-4 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2">
         <Card v-for="item in species" :key="item._id" class="aspect-video rounded-xl bg-muted/50 pt-4 pb-4">
           <CardHeader>
             <CardTitle class="mb-3">{{item.CommonName}}</CardTitle>
@@ -111,7 +105,8 @@ const  getSpecies = async () => {
           </CardFooter>
         </Card>
       </div>
-      <div class="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" ></div>
+
+      
     </div>
 
     <div class="text-center p-4">

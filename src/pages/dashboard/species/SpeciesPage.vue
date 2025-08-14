@@ -174,6 +174,8 @@ const fillerData = (search={query:"",city:""}) => {
       }
     }
   }
+
+  
 </script>
 
 
