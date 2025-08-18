@@ -20,7 +20,7 @@ defineEmits(['update:page'])
   <Pagination v-slot="{ page }" :items-per-page="itemsPerPage" :total="total" :default-page="defaultPage">
     <PaginationContent v-slot="{ items }">
       <PaginationFirst @click="$emit('update:page', 1)" />
-      <PaginationPrevious @click="$emit('update:page', page )" />
+      <PaginationPrevious @click="$emit('update:page', page - 1 )" />
       <template v-for="(item, index) in items" :key="index">
         <PaginationItem
           v-if="item.type === 'page'"
@@ -32,7 +32,7 @@ defineEmits(['update:page'])
         </PaginationItem>
       </template>
       <PaginationEllipsis v-if="Math.ceil(total / itemsPerPage) === 1 || defaultPage <= Math.ceil(total / itemsPerPage) - 3" :index="4" />
-      <PaginationNext  @click="$emit('update:page', page )" />
+      <PaginationNext  @click="$emit('update:page', page +1 )" />
       <PaginationLast @click="$emit('update:page', (Math.ceil(total / itemsPerPage)))" />
     </PaginationContent>
   </Pagination>

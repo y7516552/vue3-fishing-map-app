@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { AspectRatio } from '@/components/ui/aspect-ratio'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted , computed, watch} from 'vue'
 import {Info} from 'lucide-vue-next';
 import MessageDialog from '@/components/MessageDialog.vue'
 import ReportDialog from '@/components/ReportDialog.vue'
@@ -20,13 +20,16 @@ import { useReport } from '@/composable/report'
 import { useUserStore }from'@/stores/user'
 import { storeToRefs } from 'pinia'
 
-const tagList = ["全部","", "臺北市", "新北市", "桃園市", "新竹市", "新竹縣", "苗栗縣", "臺中市", "彰化縣", "南投縣", "雲林縣", "嘉義市", "嘉義縣", "臺南市", "高雄市", "屏東縣", "宜蘭縣", "花蓮縣", "臺東縣", "澎湖縣"]
-const tag = ref("全部")
+
 
   
 const { species, loading,  getSpecies } = useSpecies()
 
 const tagList = [
+  { 
+    name: '全部', 
+    color: 'bg-gray-500' 
+  },
   {
     name:'淡水',
     color:'bg-blue-500'
@@ -45,6 +48,8 @@ const tagList = [
     color:'bg-rose-500'
   }
 ]
+const tag = ref("全部")
+
 const tagData = (tag) => {
   return tagList.find(e=>e.name == tag)
 }
@@ -58,10 +63,10 @@ const pageSize = 10 // 每頁顯示幾筆
 const currentPage = ref(1)
 
 const filteredSpecies = computed(() => {
-  if (city.value === "全部") {
+  if (tag.value === "全部") {
     return species.value
   }
-  return species.value.filter(item => item.city === city.value)
+  return species.value.filter(item => item.tags.includes(tag.value))
 })
 
 const pagedSpecies = computed(() => {
@@ -85,7 +90,7 @@ const goToPage = (page) => {
   }
 }
 
-watch(city, () => {
+watch(tag, () => {
   currentPage.value = 1
 })
 
@@ -129,6 +134,9 @@ watch(city, () => {
 
 <template>
   <div>
+    <div class="flex gap-4 flex-wrap p-4">
+      <Button v-for="item in tagList" :key="item.name" @click="tag=item.name"  :variant="tag===item.name ? 'outline' : ''"> {{item.name}}</Button>
+    </div>
     <div class="p-4">
       <Button variant="outline" @click="openReportDialog">
         <Info/>
@@ -148,7 +156,7 @@ watch(city, () => {
       </div>
 
       <div v-else class="grid auto-rows-min gap-4 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2">
-        <Card v-for="item in species" :key="item._id" class="aspect-video rounded-xl bg-muted/50 pt-4 pb-4">
+        <Card v-for="item in pagedSpecies" :key="item._id" class="aspect-video rounded-xl bg-muted/50 pt-4 pb-4">
           <CardHeader>
             <CardTitle class="mb-3">{{item.CommonName}}</CardTitle>
             <CardDescription>學名:  {{item.ScientificName}}</CardDescription>
@@ -175,9 +183,15 @@ watch(city, () => {
             </a>
           </CardFooter>
         </Card>
+        <div v-if="!pagedSpecies.length" class="col-span-full text-center">
+          <p>沒有符合的資料</p>
+        </div>
       </div>
 
       
+    </div>
+    <div class="my-4" v-if="pagedSpecies.length !==0">
+      <PaginationBar :items-per-page="pageSize" :total="filteredSpecies.length" :default-page="currentPage"  @update:page="goToPage"/>
     </div>
 
     <div class="text-center p-4">
