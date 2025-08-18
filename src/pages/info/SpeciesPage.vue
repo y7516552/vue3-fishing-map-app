@@ -8,27 +8,93 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import { AspectRatio } from '@/components/ui/aspect-ratio'
-import { ref, onMounted,watch } from 'vue'
+import { ref, onMounted } from 'vue'
 import {Info} from 'lucide-vue-next';
 import MessageDialog from '@/components/MessageDialog.vue'
 import ReportDialog from '@/components/ReportDialog.vue'
+import PaginationBar from '@/components/PaginationBar.vue'
 import { useSpecies } from '@/composable/species'
+import { useReport } from '@/composable/report'
 import { useUserStore }from'@/stores/user'
 import { storeToRefs } from 'pinia'
 
-  const { species, loading, error, getSpecies } = useSpecies()
+const tagList = ["全部","", "臺北市", "新北市", "桃園市", "新竹市", "新竹縣", "苗栗縣", "臺中市", "彰化縣", "南投縣", "雲林縣", "嘉義市", "嘉義縣", "臺南市", "高雄市", "屏東縣", "宜蘭縣", "花蓮縣", "臺東縣", "澎湖縣"]
+const tag = ref("全部")
 
-  watch(error,()=>{
-    console.log('error',error.value)
-  })
+  
+const { species, loading,  getSpecies } = useSpecies()
 
-  onMounted(async()=>{
-    await getSpecies()
-  })
+const tagList = [
+  {
+    name:'淡水',
+    color:'bg-blue-500'
+  },
+  {
+    name:'海水',
+    value:'data',
+    color:'bg-blue-500'
+  },
+  {
+    name:'台灣特有',
+    color:'bg-lime-500'
+  },
+  {
+    name:'外來入侵',
+    color:'bg-rose-500'
+  }
+]
+const tagData = (tag) => {
+  return tagList.find(e=>e.name == tag)
+}
+
+
+onMounted(async()=>{
+  await getSpecies()
+})
+
+const pageSize = 10 // 每頁顯示幾筆
+const currentPage = ref(1)
+
+const filteredSpecies = computed(() => {
+  if (city.value === "全部") {
+    return species.value
+  }
+  return species.value.filter(item => item.city === city.value)
+})
+
+const pagedSpecies = computed(() => {
+  if(!filteredSpecies.value.length ) {
+    return []
+  }
+  const start = (currentPage.value - 1) * pageSize
+  return filteredSpecies.value.slice(start, start + pageSize)
+})
+
+const totalPages = computed(() => {
+  if(!filteredSpecies.value.length) {
+    return 0
+  }
+  return Math.ceil(filteredSpecies.value.length / pageSize)
+})
+
+const goToPage = (page) => {
+  if (page >= 1 && page <= totalPages.value) {
+    currentPage.value = page
+  }
+}
+
+watch(city, () => {
+  currentPage.value = 1
+})
+
+
+
+
 
   const store = useUserStore()
-  const { isLogin, userData} = storeToRefs(store)
+  const { isLogin} = storeToRefs(store)
   const openMsg = ref(false)
   const MsgData =ref({
     title:'',
@@ -51,9 +117,11 @@ import { storeToRefs } from 'pinia'
     }
   }
 
-  const sendReport = (data) => {
+  const { addReport } = useReport()
+
+  const sendReport = async (data) => {
     openReport.value = false
-    console.log(data,userData)
+    await addReport(data)
   }
 
 
@@ -86,11 +154,14 @@ import { storeToRefs } from 'pinia'
             <CardDescription>學名:  {{item.ScientificName}}</CardDescription>
           </CardHeader>
           <CardContent>
+            <div class="mb-3">
+              <Badge v-for="tag in item.tags" :key="tag" class="mr-2" :class="tagData(tag).color">{{ tag }}</Badge>
+            </div>
             <div class="w-full max-w-3/4">
               <AspectRatio  :ratio="2 / 1">
                 <img :src="item.imageUrl" :alt="item.name" class="rounded-md object-cover w-full h-full bg-gray-300">
               </AspectRatio>
-          </div>
+            </div>
           </CardContent>
           <CardFooter >
             <p>魚類資料庫連結:</p>

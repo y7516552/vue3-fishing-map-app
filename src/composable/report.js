@@ -40,6 +40,7 @@ export function useReport() {
     try {
       await reportAPI.post(apiUrl,report)
       loading.value = false
+      toast.success('回報成功')
     } catch (error) {
         console.log(error)
         toast.warning('資料取得失敗', {

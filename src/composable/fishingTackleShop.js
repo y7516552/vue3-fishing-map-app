@@ -17,15 +17,7 @@ export function useFishingTackleShop() {
     try {
         const { data } =await axios.get(apiUrl)
         fishingTackleShops.value=data.result
-        // cityList.forEach((e) => {
-        //   fishingTackleShops.value[e]=[]
-        // })
-
-        // fishingTackleShops.value["全部"] = data.result
-
-        // data.result.forEach(item =>{
-        //   fishingTackleShops.value[item.city].push(item)
-        // })
+        
 
     } catch (error) {
         console.log(error)
