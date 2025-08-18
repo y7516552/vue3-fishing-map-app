@@ -1,35 +1,15 @@
-# vue3-fishing-map-app
+# 台灣釣魚地圖
+大家好，歡迎來到台灣釣魚地圖。
+歡迎各位前端朋友或釣友來這裡互相交流、分享釣點、分享經驗。
+希望大家能愛護環境，垃圾帶走、小魚放生。
+有任何疑問或想法歡迎提出，資料如有錯誤，歡迎大家回報勘誤。
 
-This template should help get you started developing with Vue 3 in Vite.
+## 關於這個專案
+因為喜歡釣魚也喜歡跟不同的釣友交流
+所以開始萌生製作這個平台的想法
+前端使用VUE進行開發
+目前還在開發階段
 
-## Recommended IDE Setup
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
 
-## Customize configuration
 
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
