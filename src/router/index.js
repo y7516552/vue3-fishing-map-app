@@ -1,22 +1,27 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-import HomeLayout from '@/components/layout/HomeLayout.vue'
-import MapView from '@/views/MapView.vue'
-import CommunityView from '@/views/CommunityView.vue'
-import InfoView from '@/views/InfoView.vue'
-import InfoPage from '@/pages/info/InfoPage.vue'
-import FishingSpots from '@/pages/info/FishingSpotsPage.vue'
-import FishingTackleShop from '@/pages/info/FishingTackleShopPage.vue'
-import Species from '@/pages/info/SpeciesPage.vue'
-import ErrorPage from '@/pages/ErrorPage.vue'
-import AdminLayout from '@/components/layout/AdminLayout.vue'
-import DashboardPage from '@/pages/dashboard/dashboardPage.vue'
-import DashboardSpecies from '@/pages/dashboard/species/SpeciesPage.vue'
-import DashboardFishingSpot from '@/pages/dashboard/fishingSpot/FishingSpotPage.vue'
-import DashboardFishingTackleShop from '@/pages/dashboard/fishingTackleShop/FishingTackleShopPage.vue'
-import DashboardReport from '@/pages/dashboard/report/ReportPage.vue'
-import DashboardUser from '@/pages/dashboard/user/UserPage.vue'
-import NoAccessPage from '@/pages/NoAccessPage.vue'
+
+
+const ErrorPage = () => import('@/pages/ErrorPage.vue')
+const NoAccessPage = () => import('@/pages/NoAccessPage.vue')
+const HomeLayout = () => import('@/components/layout/HomeLayout.vue')
+const HomeView = () => import('@/views/HomeView.vue')
+const MapView = () => import('@/views/MapView.vue')
+const CommunityView = () => import('@/views/CommunityView.vue')
+const AboutView = () => import('@/views/AboutView.vue')
+const InfoView = () => import('@/views/InfoView.vue')
+const InfoPage = () => import('@/pages/info/InfoPage.vue')
+const FishingSpots = () => import('@/pages/info/FishingSpotsPage.vue')
+const FishingTackleShop = () => import('@/pages/info/FishingTackleShopPage.vue')
+const Species = () => import('@/pages/info/SpeciesPage.vue')
+const AdminLayout = () => import('@/components/layout/AdminLayout.vue')
+const DashboardPage = () => import('@/pages/dashboard/dashboardPage.vue')
+const DashboardFishingSpot = () => import('@/pages/dashboard/fishingSpot/FishingSpotPage.vue')
+const DashboardFishingTackleShop = () => import('@/pages/dashboard/fishingTackleShop/FishingTackleShopPage.vue')
+const DashboardSpecies = () => import('@/pages/dashboard/species/SpeciesPage.vue')
+const DashboardReport = () => import('@/pages/dashboard/report/ReportPage.vue')
+const DashboardUser = () => import('@/pages/dashboard/user/UserPage.vue') 
+  
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -56,7 +61,7 @@ const router = createRouter({
           meta:{
             title:"關於網站",
           },
-          component: () => import('../views/AboutView.vue'),
+          component: AboutView,
         },
         {
           path: '/info',
@@ -72,7 +77,7 @@ const router = createRouter({
               meta:{
                 title:"資訊一覽",
               },
-              component: InfoPage,
+              component:InfoPage,
             },
             {
               path: '/info/fishingSpot',
