@@ -21,16 +21,12 @@ import {
 } from 'lucide-vue-next';
 import { useUserStore }from'../stores/user'
 import { storeToRefs } from 'pinia'
-import {   watch } from 'vue';
 
 const store = useUserStore()
-const { check ,logout} = store
+const { logout} = store
 const { isLogin, userData } = storeToRefs(store)
-check()
 
-watch(isLogin,()=>{
 
-})
 
 const emit = defineEmits(['openLoginDialog'])
 const openLoginDialog = () => {

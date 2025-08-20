@@ -19,8 +19,10 @@ import { ref, onMounted } from 'vue';
 import MessageDialog from '@/components/MessageDialog.vue'
 import ReportDialog from '@/components/ReportDialog.vue'
 import { useUserStore }from'@/stores/user'
+
 import { useReport } from '@/composable/report'
 import { storeToRefs } from 'pinia'
+
 
 const cityList = ["全部","基隆市", "臺北市", "新北市", "桃園市", "新竹市", "新竹縣", "苗栗縣", "臺中市", "彰化縣", "南投縣", "雲林縣", "嘉義市", "嘉義縣", "基隆市", "臺南市", "高雄市", "屏東縣", "宜蘭縣", "花蓮縣", "臺東縣", "澎湖縣"]
 const city = ref("全部")
@@ -118,7 +120,7 @@ const openReport = ref(false)
         <Card v-for="item in fishingSpotList[city]" :key="item._id" class="aspect-video rounded-xl bg-muted/50 pt-0 pb-4">
           <div class="w-full">
             <AspectRatio  :ratio="16 / 9">
-              <img :src="item.imageUrl" :alt="item.name" class="rounded-md object-cover w-full h-full bg-gray-300">
+              <img loading="lazy" :src="item.imageUrl" :alt="item.name" class="rounded-md object-cover w-full h-full bg-gray-300">
             </AspectRatio>
           </div>
           <CardHeader>

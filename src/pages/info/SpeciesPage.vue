@@ -1,5 +1,6 @@
 <script setup>
 import { Button } from '@/components/ui/button'
+import { ScrollArea } from "@/components/ui/scroll-area"
 import {
   Card,
   CardContent,
@@ -143,53 +144,58 @@ watch(tag, () => {
         問題回報
       </Button>
     </div>
-    
-    <div class="flex flex-1 flex-col gap-4 p-3">
 
-      <div v-if="loading" class="grid auto-rows-min gap-4 md:grid-cols-3">
-        <div class="aspect-video rounded-xl bg-muted/50" />
-        <div class="aspect-video rounded-xl bg-muted/50" />
-        <div class="aspect-video rounded-xl bg-muted/50" />
-        <div class="aspect-video rounded-xl bg-muted/50" />
-        <div class="aspect-video rounded-xl bg-muted/50" />
-        <div class="aspect-video rounded-xl bg-muted/50" />
-      </div>
+    <ScrollArea class="h-140 w-full rounded-md ">
 
-      <div v-else class="grid auto-rows-min gap-4 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2">
-        <Card v-for="item in pagedSpecies" :key="item._id" class="aspect-video rounded-xl bg-muted/50 pt-4 pb-4">
-          <CardHeader>
-            <CardTitle class="mb-3">{{item.CommonName}}</CardTitle>
-            <CardDescription>學名:  {{item.ScientificName}}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div class="mb-3">
-              <Badge v-for="tag in item.tags" :key="tag" class="mr-2" :class="tagData(tag).color">{{ tag }}</Badge>
-            </div>
-            <div class="w-full max-w-3/4">
-              <AspectRatio  :ratio="2 / 1">
-                <img :src="item.imageUrl" :alt="item.name" class="rounded-md object-cover w-full h-full bg-gray-300">
-              </AspectRatio>
-            </div>
-          </CardContent>
-          <CardFooter >
-            <p>魚類資料庫連結:</p>
-            <a 
-              :href="item.fishDBUrl" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              class="mx-4 text-blue-600"
-              >
-              點我
-            </a>
-          </CardFooter>
-        </Card>
-        <div v-if="!pagedSpecies.length" class="col-span-full text-center">
-          <p>沒有符合的資料</p>
+      <div class="flex flex-1 flex-col gap-4 p-3">
+  
+        <div v-if="loading" class="grid auto-rows-min gap-4 md:grid-cols-3">
+          <div class="aspect-video rounded-xl bg-muted/50" />
+          <div class="aspect-video rounded-xl bg-muted/50" />
+          <div class="aspect-video rounded-xl bg-muted/50" />
+          <div class="aspect-video rounded-xl bg-muted/50" />
+          <div class="aspect-video rounded-xl bg-muted/50" />
+          <div class="aspect-video rounded-xl bg-muted/50" />
         </div>
+  
+        <div v-else class="grid auto-rows-min gap-4 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2">
+          <Card v-for="item in pagedSpecies" :key="item._id" class="aspect-video rounded-xl bg-muted/50 pt-4 pb-4">
+            <CardHeader>
+              <CardTitle class="mb-3">{{item.CommonName}}</CardTitle>
+              <CardDescription>學名:  {{item.ScientificName}}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div class="mb-3">
+                <Badge v-for="tag in item.tags" :key="tag" class="mr-2" :class="tagData(tag).color">{{ tag }}</Badge>
+              </div>
+              <div class="w-full max-w-3/4">
+                <AspectRatio  :ratio="2 / 1">
+                  <img loading="lazy" :src="item.imageUrl" :alt="item.name" class="rounded-md object-cover w-full h-full bg-gray-300">
+                </AspectRatio>
+              </div>
+            </CardContent>
+            <CardFooter >
+              <p>魚類資料庫連結:</p>
+              <a 
+                :href="item.fishDBUrl" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                class="mx-4 text-blue-600"
+                >
+                點我
+              </a>
+            </CardFooter>
+          </Card>
+         
+          <div v-if="!pagedSpecies.length" class="col-span-full text-center">
+            <p>沒有符合的資料</p>
+          </div>
+        </div>
+  
+        
       </div>
+    </ScrollArea>
 
-      
-    </div>
     <div class="my-4" v-if="pagedSpecies.length !==0">
       <PaginationBar :items-per-page="pageSize" :total="filteredSpecies.length" :default-page="currentPage"  @update:page="goToPage"/>
     </div>

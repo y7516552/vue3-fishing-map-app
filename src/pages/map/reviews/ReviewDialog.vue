@@ -28,7 +28,6 @@ import { TagsInput, TagsInputInput, TagsInputItem, TagsInputItemDelete, TagsInpu
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
-import { toast } from 'vue-sonner'
 import { storage } from '@/firebase/index';
 import { ref as storageRef, uploadBytesResumable, getDownloadURL,deleteObject } from 'firebase/storage';
 import { AspectRatio } from '@/components/ui/aspect-ratio'
@@ -285,7 +284,7 @@ function onSubmit(values) {
             <div v-if="downloadURL" class="flex content-center">
               <div class="w-[300px] h-[200px]">
                 <AspectRatio :ratio="16 / 9">
-                  <img :src="downloadURL" alt="Image" class="rounded-md object-cover w-full h-full">
+                  <img loading="lazy" :src="downloadURL" alt="Image" class="rounded-md object-cover w-full h-full">
                 </AspectRatio>
               </div>
             </div>

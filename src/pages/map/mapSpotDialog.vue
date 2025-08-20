@@ -29,6 +29,10 @@ import { inject ,ref, watch} from 'vue'
 import { useUserStore }from'../../stores/user'
 import { storeToRefs } from 'pinia'
 
+
+
+
+
 const store = useUserStore()
 const { isLogin ,userData} = storeToRefs(store)
 
@@ -161,7 +165,7 @@ const addReview = async(data)=>{
         <DialogScrollContent class="z-1000 p-0 lg:max-w-[825px] sm:max-w-[425px] grid-rows-[auto_minmax(0,1fr)_auto]  gap-y-6">
           <div class="w-full">
             <AspectRatio  :ratio="16 / 9">
-              <img :src="spotData.imageUrl" :alt="spotData.name" class="rounded-md object-cover w-full h-full bg-gray-300">
+              <img loading="lazy" :src="spotData.imageUrl" :alt="spotData.name" class="rounded-md object-cover w-full h-full bg-gray-300">
             </AspectRatio>
           </div>
           <DialogHeader class="mx-6 mb-6">
@@ -242,7 +246,7 @@ const addReview = async(data)=>{
                   <p class="mb-3">魚種:</p>
                   <div class="flex">
                     <div class="" v-for="fish in item.catchs" :key="fish._id">
-                      <img class="max-w-[120px] rounded-md"  :src="fish.imageUrl" alt="">
+                      <img loading="lazy" class="max-w-[120px] rounded-md"  :src="fish.imageUrl" alt="">
                       <p>{{ fish.CommonName }}</p>
                     </div>
                   </div>
@@ -252,7 +256,7 @@ const addReview = async(data)=>{
                   <p class="mb-3">魚獲照片:</p>
                   <CarouselContent>
                     <CarouselItem v-for="(image,index) in item.imageUrlList" :key="image" class="md:basis-1/2 lg:basis-1/3" >
-                      <img class="rounded-md" :src="image" :alt="item.title+index">
+                      <img loading="lazy" class="rounded-md" :src="image" :alt="item.title+index">
                     </CarouselItem>
                   </CarouselContent>
                   <CarouselPrevious />

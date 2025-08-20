@@ -167,7 +167,7 @@ const fillerData = (search={query:"",city:""}) => {
             <TableCell  class="text-center">
               <div class="w-[200px]">
                 <AspectRatio :ratio="16 / 9">
-                  <img :src="item.avatarUrl" :alt="item.name" class="rounded-md object-cover w-full h-full">
+                  <img loading="lazy" :src="item.avatarUrl" :alt="item.name" class="rounded-md object-cover w-full h-full">
                 </AspectRatio>
               </div>
             </TableCell>

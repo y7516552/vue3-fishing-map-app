@@ -1,4 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useUserStore }from'@/stores/user'
+import { useFrontStore } from '@/stores/front'
+import { storeToRefs } from 'pinia'
 
 
 const ErrorPage = () => import('@/pages/ErrorPage.vue')
@@ -105,7 +108,14 @@ const router = createRouter({
             }
           ]
         },
-      ]
+      ],
+      async beforeEnter() {
+        const userStore = useUserStore();
+        await userStore.check();
+        const frontStore = useFrontStore();
+        await frontStore.getFishingSpotList();
+        await frontStore.getFishingTackleShopList();
+      },
     },
     {
       path: '/admin/dashboard',
@@ -162,9 +172,21 @@ const router = createRouter({
           },
           component: DashboardUser,
         },
-      ]
+      ],
+      async beforeEnter() {
+        const userStore = useUserStore();
+        const { isLogin,userData } = storeToRefs(userStore)
+        await userStore.check();
+        await userStore.getUserdata()
+        if (!isLogin.value || userData.value.role !== 'admin') {
+          return { name: 'NoAccess' }
+        }
+      },
     }
   ],
+  scrollBehavior() {
+    return { top: 0 }
+  },
 })
 
 export default router

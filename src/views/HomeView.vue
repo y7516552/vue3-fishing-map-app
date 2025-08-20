@@ -54,7 +54,7 @@ const cardData = [
       </div>
       <div class="">
         <AspectRatio  :ratio="4 / 3">
-          <img :src="heroData.imageUrl" :alt="heroData.title" class="rounded-md object-cover w-full h-full bg-gray-300">
+          <img loading="lazy" :src="heroData.imageUrl" :alt="heroData.title" class="rounded-md object-cover w-full h-full bg-gray-300">
         </AspectRatio>
       </div>
     </div>

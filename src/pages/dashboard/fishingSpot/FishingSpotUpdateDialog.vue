@@ -298,7 +298,7 @@ const updateLngLat = (data) => {
                   <p class="text-base">圖片</p>
                   <div class="w-[300px] h-[200px]">
                     <AspectRatio v-for="item in props.data.imageUrlList" :key="item" :ratio="16 / 9">
-                      <img :src="item" alt="Image" class="rounded-md object-cover w-full h-full">
+                      <img loading="lazy" :src="item" alt="Image" class="rounded-md object-cover w-full h-full">
                     </AspectRatio>
                   </div>
                 </div>
@@ -315,7 +315,7 @@ const updateLngLat = (data) => {
                       <div v-if="downloadURL" class="flex gap-1 items-center mt-2">
                         <div class="w-[300px] h-[200px]">
                           <AspectRatio :ratio="16 / 9">
-                            <img :src="downloadURL" alt="Image" class="rounded-md object-cover w-full h-full">
+                            <img loading="lazy" :src="downloadURL" alt="Image" class="rounded-md object-cover w-full h-full">
                           </AspectRatio>
                         </div>
                         <Button  variant="destructive"  type="button" @click="removeImg(downloadURL)">

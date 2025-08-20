@@ -219,7 +219,7 @@ function onSubmit(values) {
                   <div v-if="downloadURL" class="flex gap-1 items-center mt-2">
                     <div class="w-[300px] h-[200px]">
                       <AspectRatio :ratio="16 / 9">
-                        <img :src="downloadURL" alt="Image" class="rounded-md object-cover w-full h-full">
+                        <img loading="lazy" :src="downloadURL" alt="Image" class="rounded-md object-cover w-full h-full">
                       </AspectRatio>
                     </div>
                     <Button  variant="destructive"  type="button" @click="removeImg(downloadURL)">

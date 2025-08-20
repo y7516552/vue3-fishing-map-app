@@ -4,6 +4,7 @@ import { useCookies } from '@vueuse/integrations/useCookies'
 import dashboardSearchbar from '../dashboardSearchbar.vue';
 import SpeciesUpdateDialog from './SpeciesUpdateDialog.vue';
 import DashboardMessageDialog from '../dashboardMessageDialog.vue';
+import { ScrollArea } from "@/components/ui/scroll-area"
 import {
   Table,
   TableBody,
@@ -189,52 +190,55 @@ const fillerData = (search={query:"",city:""}) => {
       </Button>
     </div>
     <div class="p-4">
-      <Table>
-        <TableCaption>A list of {{ dataType }}.</TableCaption>
-        <TableHeader>
-          <TableRow>
-            <TableHead v-for="item in tableHead" :key="item"  class="text-center">{{ item }}</TableHead>
+      <ScrollArea class="h-[200px] w-48 rounded-md border">
+
+        <Table>
+          <TableCaption>A list of {{ dataType }}.</TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead v-for="item in tableHead" :key="item"  class="text-center">{{ item }}</TableHead>
+              
+            </TableRow>
+          </TableHeader>
+          <TableBody v-if="pageFillterdData.length!==0">
             
-          </TableRow>
-        </TableHeader>
-        <TableBody v-if="pageFillterdData.length!==0">
-          
-          <TableRow v-for="item in pageFillterdData" :key="item._id">
-            <TableCell class="font-medium text-center">
-              {{ item.CommonName }}
-            </TableCell>
-            <TableCell class="text-center">{{ item.ScientificName }}</TableCell>
-            <TableCell  class="flex justify-center">
-              <div class="w-[200px]">
-                <AspectRatio :ratio="16 / 9">
-                  <img :src="item.imageUrl" :alt="item.ScientificName" class="rounded-md object-cover w-full h-full">
-                </AspectRatio>
-              </div>
-            </TableCell>
-            <TableCell class="text-center">
-              <Badge v-for=" tag in item.tags" :key="tag" class="bg-sky-600 mr-1">{{ tag }}</Badge>
-            </TableCell>
-            <TableCell  class="text-center">
-              <a :href="item.fishDBUrl" target="_blank" rel="noopener noreferrer">連結</a>
-            </TableCell>
-            <TableCell class="text-center">
-              <Button @click="openUpdateDialog('edit',item)" variant="outline">
-                <SquarePen/>
-              </Button>
-              <Button @click="openDeleteDialog(item)" variant="destructive">
-                <Trash2 />
-              </Button>
-            </TableCell>
-          </TableRow>
-        </TableBody>
-        <TableBody v-else class="">
-          <TableRow>
-            <TableCell>
-              查無資料...
-            </TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
+            <TableRow v-for="item in pageFillterdData" :key="item._id">
+              <TableCell class="font-medium text-center">
+                {{ item.CommonName }}
+              </TableCell>
+              <TableCell class="text-center">{{ item.ScientificName }}</TableCell>
+              <TableCell  class="flex justify-center">
+                <div class="w-[200px]">
+                  <AspectRatio :ratio="16 / 9">
+                    <img loading="lazy" :src="item.imageUrl" :alt="item.ScientificName" class="rounded-md object-cover w-full h-full">
+                  </AspectRatio>
+                </div>
+              </TableCell>
+              <TableCell class="text-center">
+                <Badge v-for=" tag in item.tags" :key="tag" class="bg-sky-600 mr-1">{{ tag }}</Badge>
+              </TableCell>
+              <TableCell  class="text-center">
+                <a :href="item.fishDBUrl" target="_blank" rel="noopener noreferrer">連結</a>
+              </TableCell>
+              <TableCell class="text-center">
+                <Button @click="openUpdateDialog('edit',item)" variant="outline">
+                  <SquarePen/>
+                </Button>
+                <Button @click="openDeleteDialog(item)" variant="destructive">
+                  <Trash2 />
+                </Button>
+              </TableCell>
+            </TableRow>
+          </TableBody>
+          <TableBody v-else class="">
+            <TableRow>
+              <TableCell>
+                查無資料...
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </ScrollArea>
     </div>
     <SpeciesUpdateDialog :openUpdateDialog="openUpdate" :dataType="dataType" :data="updateData" @close="()=> {openUpdate=false}" @updateItem="updateItem"></SpeciesUpdateDialog>
     <DashboardMessageDialog :data="MsgData" :open="openMsg" @close="()=> {openMsg=false}"  @deleteItem="deleteItem"></DashboardMessageDialog>

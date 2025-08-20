@@ -75,7 +75,7 @@ const updateDialogState = (e) => {
           <div class="grid gap-3">
             <div class="w-[200px]">
                 <AspectRatio :ratio="16 / 9">
-                  <img :src="props.data.avatarUrl" :alt="props.data.name" class="rounded-md object-cover w-full h-full">
+                  <img loading="lazy" :src="props.data.avatarUrl" :alt="props.data.name" class="rounded-md object-cover w-full h-full">
                 </AspectRatio>
               </div>
           </div>
