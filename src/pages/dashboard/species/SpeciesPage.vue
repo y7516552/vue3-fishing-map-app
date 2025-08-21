@@ -190,8 +190,7 @@ const fillerData = (search={query:"",city:""}) => {
       </Button>
     </div>
     <div class="p-4">
-      <ScrollArea class="h-[200px] w-48 rounded-md border">
-
+      <ScrollArea class="h-100 w-full rounded-md border">
         <Table>
           <TableCaption>A list of {{ dataType }}.</TableCaption>
           <TableHeader>

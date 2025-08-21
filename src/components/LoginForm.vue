@@ -1,4 +1,5 @@
 <script setup>
+import axios from 'axios'
 import { LoaderCircle} from 'lucide-vue-next'
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -16,12 +17,15 @@ import {
   FormMessage
 } from '@/components/ui/form'
 import { useUserStore }from'../stores/user'
-import {  ref } from 'vue';
+import {  ref,onMounted } from 'vue';
+const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID
+const CLIENT_URL = import.meta.env.VITE_GOOGLE_CLIENT_URL
+const API_URL = import.meta.env.VITE_APP_API_URL + "user/google/verify-token"
 
 const isLoading = ref(false)
 
 const store = useUserStore()
-const { login } = store
+const { login, googleLogin } = store
 
 const emit = defineEmits(['loginSubmitted','loginFail'])
 const props = defineProps({
@@ -50,6 +54,39 @@ const onSubmit = form.handleSubmit( async (values) => {
     emit('loginFail',error)
     isLoading.value = false
   }
+})
+
+const onLogin = async (res) => {
+  isLoading.value = true
+  const axiosOptions = {
+    headers: { "Access-Control-Allow-Origin": CLIENT_URL },
+  };
+  try {
+    const response = await axios.post(API_URL, res, axiosOptions);
+    await googleLogin(response.data)
+    emit('loginSubmitted')
+  } catch (error) {
+    emit('loginFail',error)
+  }finally {
+    isLoading.value = false
+  }
+};
+
+  
+
+onMounted(() => {
+  window.google.accounts.id.initialize({
+    client_id: CLIENT_ID, // required
+    callback: onLogin, // invoke while user login in the popup
+    cancel_on_tap_outside: true, // optional
+    context: "signin", // optional
+  });
+  window.google.accounts.id.renderButton(
+    document.getElementById("googleButton"),
+    { theme: "outline", size: "large" } // customization attributes
+  );
+  // window.google.accounts.id.prompt(); // show one-tap popup
+  
 })
 </script>
 
@@ -92,9 +129,10 @@ const onSubmit = form.handleSubmit( async (values) => {
         </div>
         <div class="flex flex-col gap-3">
           <Button type="submit" class="w-full"> Login </Button>
-          <Button variant="outline" class="w-full">
+          <!-- <Button id="googleButton"  type="button" variant="outline" class="w-full">
             Login with Google
-          </Button>
+          </Button> -->
+          <button id="googleButton" type="button">google</button>
         </div>
       </div>
       <div class="mt-4 text-center text-sm">
@@ -102,6 +140,7 @@ const onSubmit = form.handleSubmit( async (values) => {
         <a href="#" class="underline underline-offset-4"> Sign up </a>
       </div>
     </form>
+    <!-- <button id="googleButton" type="button">google</button> -->
     <div class="loading bg-gray-800 opacity-50 absolute bottom-0 left-0 w-full h-full  justify-center items-center " :class="[isLoading ? 'flex':'hidden']">
       <LoaderCircle size="128" color="white" class="mr-3 animate-spin"/>
     </div>

@@ -5,6 +5,7 @@ import { useCookies } from '@vueuse/integrations/useCookies'
 import { toast } from 'vue-sonner'
 
 
+
 export const useUserStore = defineStore('user', () => {
 
   const cookies = useCookies(['fishingMap'])
@@ -19,6 +20,8 @@ export const useUserStore = defineStore('user', () => {
       Authorization:`${token}`
     },
   });
+
+  
 
   const isLogin = ref(false)
   const userData = ref({
@@ -84,5 +87,22 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  return {isLogin, userData, check, login, signup,logout,getUserdata}
+  async function googleLogin(data) {
+    
+    try{
+
+      cookies.set('fishingMap',data.token)
+      userData.value = data.result
+      isLogin.value = true
+      toast.success('登入成功', {
+        description: '歡迎回來',
+      })
+
+    }catch(error) {
+      isLogin.value = false
+      throw error
+    }
+  }
+
+  return {isLogin, userData, check, login, signup,logout,getUserdata, googleLogin}
 })
