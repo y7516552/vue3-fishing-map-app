@@ -2,6 +2,7 @@
 import {Search, RotateCw, LoaderCircle, MessageCircleMore, ThumbsUp ,Info} from 'lucide-vue-next';
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { AspectRatio } from '@/components/ui/aspect-ratio'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -15,9 +16,10 @@ import {
 } from '@/components/ui/card'
 import StarRating from 'vue-star-rating'
 import { useFishingSpot } from '@/composable/fishingSpot'
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import MessageDialog from '@/components/MessageDialog.vue'
 import ReportDialog from '@/components/ReportDialog.vue'
+import PaginationBar from '@/components/PaginationBar.vue'
 import { useUserStore }from'@/stores/user'
 
 import { useReport } from '@/composable/report'
@@ -36,10 +38,10 @@ const {loading, fishingSpots, getFishingSpots } = useFishingSpot()
 onMounted(async()=>{
   await getFishingSpots()
   
-  fishingSpotList.value["全部"] =[...fishingSpots.value]
-  fishingSpots.value.forEach(item =>{
-    fishingSpotList.value[item.city].push(item)
-  })
+  // fishingSpotList.value["全部"] =[...fishingSpots.value]
+  // fishingSpots.value.forEach(item =>{
+  //   fishingSpotList.value[item.city].push(item)
+  // })
 })
 
 const store = useUserStore()
@@ -83,6 +85,40 @@ const openReport = ref(false)
   return (totalScore / rewiews.length)
 }
 
+const pageSize = 10 // 每頁顯示幾筆
+const currentPage = ref(1)
+
+const filteredSpot = computed(() => {
+  if (city.value === "全部") {
+    return fishingSpotList.value
+  }
+  return fishingSpotList.value.filter(item => item.city === city.value)
+})
+
+const pagedSpot = computed(() => {
+  if(!filteredSpot.value.length ) {
+    return []
+  }
+  const start = (currentPage.value - 1) * pageSize
+  return filteredSpot.value.slice(start, start + pageSize)
+})
+
+const totalPages = computed(() => {
+  if(!filteredSpot.value.length) {
+    return 0
+  }
+  return Math.ceil(filteredSpot.value.length / pageSize)
+})
+
+const goToPage = (page) => {
+  if (page >= 1 && page <= totalPages.value) {
+    currentPage.value = page
+  }
+}
+
+watch(city, () => {
+  currentPage.value = 1
+})
 
 
 </script>
@@ -110,58 +146,64 @@ const openReport = ref(false)
         問題回報
       </Button>
     </div>
-    <div class="flex flex-1 flex-col gap-4 p-4">
-      <div v-if="loading" class="grid auto-rows-min gap-4 md:grid-cols-3">
-        <div class="aspect-video rounded-xl bg-muted/50" ></div>
-        <div class="aspect-video rounded-xl bg-muted/50" ></div>
-        <div class="aspect-video rounded-xl bg-muted/50" ></div>
-      </div>
-      <div v-else class="grid auto-rows-min gap-4 md:grid-cols-3">
-        <Card v-for="item in fishingSpotList[city]" :key="item._id" class="aspect-video rounded-xl bg-muted/50 pt-0 pb-4">
-          <div class="w-full">
-            <AspectRatio  :ratio="16 / 9">
-              <img loading="lazy" :src="item.imageUrl" :alt="item.name" class="rounded-md object-cover w-full h-full bg-gray-300">
-            </AspectRatio>
+    <ScrollArea class="h-140 w-full rounded-md ">
+      <div class="flex flex-1 flex-col gap-4 p-4">
+        <div v-if="loading" class="grid auto-rows-min gap-4 md:grid-cols-3">
+          <div class="aspect-video rounded-xl bg-muted/50" ></div>
+          <div class="aspect-video rounded-xl bg-muted/50" ></div>
+          <div class="aspect-video rounded-xl bg-muted/50" ></div>
+        </div>
+        <div v-else class="grid auto-rows-min gap-4 md:grid-cols-3">
+          <Card v-for="item in fishingSpotList[city]" :key="item._id" class="aspect-video rounded-xl bg-muted/50 pt-0 pb-4">
+            <div class="w-full">
+              <AspectRatio  :ratio="16 / 9">
+                <img loading="lazy" :src="item.imageUrl" :alt="item.name" class="rounded-md object-cover w-full h-full bg-gray-300">
+              </AspectRatio>
+            </div>
+            <CardHeader>
+              <CardTitle>{{item.name}}</CardTitle>
+              <CardDescription>{{ item.description }}</CardDescription>
+              <CardAction>
+                <Info/>
+              </CardAction>
+            </CardHeader>
+            <CardContent>
+              <div class="mb-6">
+                <Badge >{{ item.city }}</Badge>
+              </div>
+              <div class="mb-6">
+                <star-rating
+                  class="mb-3"
+                  :show-rating="false"
+                  :rating="spotRating(item.reviews)"
+                  read-only
+                  :star-size=20
+                />
+              </div>
+            </CardContent>
+            <CardFooter class="justify-center">
+              <div class=" w-100 flex gap-6 justify-around">
+                <div class="">
+                  <MessageCircleMore/>
+                  <p>({{ item.reviews.length }})</p>
+                </div>
+                <div class="">
+                  <ThumbsUp/>
+                  <p>({{ item.likes.length }})</p>
+                </div>
+              </div>
+            </CardFooter>
+          </Card>
+          <div v-if="!fishingSpotList[city].length" >
+            <p>沒有符合的資料</p>
           </div>
-          <CardHeader>
-            <CardTitle>{{item.name}}</CardTitle>
-            <CardDescription>{{ item.description }}</CardDescription>
-            <CardAction>
-              <Info/>
-            </CardAction>
-          </CardHeader>
-          <CardContent>
-            <div class="mb-6">
-              <Badge >{{ item.city }}</Badge>
-            </div>
-            <div class="mb-6">
-              <star-rating
-                class="mb-3"
-                :show-rating="false"
-                :rating="spotRating(item.reviews)"
-                read-only
-                :star-size=20
-              />
-            </div>
-          </CardContent>
-          <CardFooter class="justify-center">
-            <div class=" w-100 flex gap-6 justify-around">
-              <div class="">
-                <MessageCircleMore/>
-                <p>({{ item.reviews.length }})</p>
-              </div>
-              <div class="">
-                <ThumbsUp/>
-                <p>({{ item.likes.length }})</p>
-              </div>
-            </div>
-          </CardFooter>
-        </Card>
-        <div v-if="!fishingSpotList[city].length" >
-          <p>沒有符合的資料</p>
         </div>
       </div>
-    </div>
+
+       <div class="my-4" v-if="pagedSpecies.length !==0">
+        <PaginationBar :items-per-page="pageSize" :total="filteredSpot.length" :default-page="currentPage"  @update:page="goToPage"/>
+      </div>
+    </ScrollArea>
     <div class="loading transition-all transition-discrete bg-gray-800 opacity-50 absolute bottom-0 left-0 w-full h-full  justify-center items-center " :class="[loading ? 'flex':'hidden']">
       <LoaderCircle size="128" color="white" class="mr-3 animate-spin"/>
     </div>

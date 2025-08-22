@@ -7,15 +7,15 @@ import { onMounted, ref, watch } from "vue";
 import fishFillIcon  from "../../assets/fish-fill-food.svg"
 import storeIcon from '../../assets/store.svg'
 import { toast } from 'vue-sonner'
-import { useFrontStore } from '@/stores/front';
-import { storeToRefs } from 'pinia'
-const frontStore = useFrontStore()
+// import { useFrontStore } from '@/stores/front';
+// import { storeToRefs } from 'pinia'
+// const frontStore = useFrontStore()
 // const { getFishingSpotList } = frontStore
-const { fishingSpotList } = storeToRefs(frontStore)
+// const { fishingSpotList } = storeToRefs(frontStore)
 
 const mapContainer = ref(null);
 
-// const fishingSpotList = ref([]);
+const fishingSpotList = ref([]);
 
 const filteredSpotList = ref([]);
 
@@ -26,22 +26,20 @@ const emit = defineEmits(['openDailog','updateDailog'])
 const props = defineProps(['spotId','updateSpot'])
 
 
-// const getfishSpot = async() => {
-//   try{
-//     let apiUrl = 'http://localhost:3000/api/v1/fishingSpot'
-//     const { data } = await axios.get(apiUrl)
+const getfishSpot = async() => {
+  try{
+    let apiUrl = 'http://localhost:3000/api/v1/fishingSpot'
+    const { data } = await axios.get(apiUrl)
     
-//     fishingSpotList.value = data.result
+    fishingSpotList.value = data.result
   
-//   }catch(error) {
-//     console.log( error)
-//     toast.warning('資料取得失敗', {
-//       description: error,
-//     })
-//   }
-    
-  
-// }
+  }catch(error) {
+    console.log( error)
+    toast.warning('資料取得失敗', {
+      description: error,
+    })
+  }
+}
 
 const fishingTackleShopList = ref([])
 
@@ -65,7 +63,7 @@ const  getFishingTackleShops = async () => {
 
 watch(() => props.updateSpot,async (newVal,oldVal) => {
   
-  // await getfishSpot()
+  await getfishSpot()
 
   console.log('spotById update',props.spotId)
   console.log('newVal',newVal,oldVal)
@@ -111,7 +109,7 @@ const filterSpot = (center) => {
 
 onMounted( async() => {
   // await getFishingSpotList()
-  // await getfishSpot()
+  await getfishSpot()
   await getFishingTackleShops()
 
   const fishingIcon = L.icon({
@@ -250,7 +248,7 @@ onMounted( async() => {
       .openOn(map);
   });
 
-  map.locate({setView: true, maxZoom: 16, enableHighAccuracy: true});
+  map.locate({setView: true, maxZoom: 13, enableHighAccuracy: true});
 
   // function onLocationFound(e) {
   //   // console.log(e)
